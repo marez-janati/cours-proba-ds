@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sommaire - Cours de Processus Stochastiques</title>
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --hover-color: #2980b9;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+            --text-color: #333;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 50px;
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 2.5rem;
+        }
+
+        p.subtitle {
+            color: #666;
+            font-size: 1.2rem;
+        }
+
+        /* Grid Layout for Cards */
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 25px;
+        }
+
+        /* Card Styling */
+        .card {
+            background: var(--card-bg);
+            border-radius: 10px;
+            padding: 25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            text-decoration: none;
+            color: var(--text-color);
+            border-left: 5px solid var(--accent-color);
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+            border-left-color: var(--primary-color);
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-number {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 4px;
+            font-size: 0.8rem;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+
+        .card h2 {
+            margin: 0 0 10px 0;
+            color: var(--primary-color);
+            font-size: 1.4rem;
+        }
+
+        .card p {
+            margin: 0;
+            color: #555;
+            font-size: 0.95rem;
+        }
+
+        .card-footer {
+            margin-top: 20px;
+            text-align: right;
+            font-weight: bold;
+            color: var(--accent-color);
+            font-size: 0.9rem;
+        }
+
+        /* Section Dividers */
+        .section-title {
+            grid-column: 1 / -1;
+            margin-top: 30px;
+            margin-bottom: 10px;
+            color: var(--primary-color);
+            font-size: 1.5rem;
+            border-left: none;
+            padding-left: 0;
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            .grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <header>
+        <h1>Probabilités & Modélisation Stochastique</h1>
+        <p class="subtitle">Cours Interactif, Simulations et Exercices Corrigés</p>
+    </header>
+
+    <div class="grid">
+
+        <!-- SECTION 1: BASICS -->
+        <h3 class="section-title">I. Fondamentaux Probabilistes</h3>
+
+        <a href="1-2.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitres 1 & 2</span>
+            </div>
+            <h2>Introduction & Fiabilité</h2>
+            <p>Définitions des processus stochastiques, classification espace-temps, variables aléatoires et introduction aux courbes de fiabilité.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <a href="3-4.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitres 3 & 4</span>
+            </div>
+            <h2>Loi Exponentielle & Poisson</h2>
+            <p>Propriété d'absence de mémoire, processus de comptage, superposition de flux et théorèmes fondamentaux.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <!-- SECTION 2: MARKOV CHAINS -->
+        <h3 class="section-title">II. Chaînes de Markov</h3>
+
+        <a href="5-6.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitres 5 & 6</span>
+            </div>
+            <h2>Temps Discret (DTMC)</h2>
+            <p>Matrices de transition, classification des états (transitoire/récurrent) et calcul du régime stationnaire.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <a href="7-8.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitres 7 & 8</span>
+            </div>
+            <h2>Temps Continu (CTMC)</h2>
+            <p>Générateur infinitésimal Q, équations de balance globale et liens entre temps discret et continu.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <a href="9.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitre 9</span>
+            </div>
+            <h2>Processus de Naissance et Mort</h2>
+            <p>Le modèle fondamental pour les files d'attente. Résolution analytique et visualisation des flux.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <!-- SECTION 3: APPLICATIONS -->
+        <h3 class="section-title">III. Applications & Synthèse</h3>
+
+        <a href="10.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitre 10</span>
+            </div>
+            <h2>Fiabilité & Disponibilité</h2>
+            <p>Ingénierie système : calculs de disponibilité pour architectures série/parallèle et gestion de la maintenance.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <a href="11.html" class="card">
+            <div class="card-header">
+                <span class="card-number">Chapitre 11</span>
+            </div>
+            <h2>Files d'Attente</h2>
+            <p>Notation de Kendall (M/M/1, M/M/S), Loi de Little, dimensionnement de réseaux et formule d'Erlang B.</p>
+            <div class="card-footer">Accéder au module &rarr;</div>
+        </a>
+
+        <a href="12.html" class="card" style="border-left-color: #27ae60;">
+            <div class="card-header">
+                <span class="card-number" style="background-color: #27ae60;">Synthèse</span>
+            </div>
+            <h2>Problèmes & Examens</h2>
+            <p>Synthèse avancée, matrices infinies, cas limites et préparation aux examens finaux.</p>
+            <div class="card-footer" style="color: #27ae60;">Accéder au module &rarr;</div>
+        </a>
+
+    </div>
+
+    <footer style="text-align: center; margin-top: 60px; color: #888; font-size: 0.9rem;">
+        <p>&copy; 2023 - Cours Interactif de Modélisation Stochastique</p>
+    </footer>
+</div>
+
+</body>
+</html>
