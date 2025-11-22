@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 12 : Synthèse et Problèmes d'Examen</title>
+    
+    <!-- Google Fonts for typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
+
+    <!-- MathJax Configuration -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <script type="text/javascript" id="MathJax-script" async
+      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    </script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #c0392b;
+            --light-bg: #ecf0f1;
+            --box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: var(--box-shadow);
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            margin-top: 40px;
+            border-left: 5px solid var(--accent-color);
+            padding-left: 15px;
+            background-color: rgba(52, 152, 219, 0.1);
+            padding: 10px 15px;
+        }
+
+        /* Educational Boxes */
+        .box {
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+
+        .definition {
+            background-color: #e8f4fd;
+            border-color: var(--accent-color);
+        }
+        .definition::before { content: "📘 DÉFINITION"; font-weight: bold; display: block; margin-bottom: 5px; color: var(--accent-color); }
+
+        .vigilance {
+            background-color: #fff3cd;
+            border-color: var(--warning-color);
+        }
+        .vigilance::before { content: "⚠️ ZONE DE VIGILANCE"; font-weight: bold; display: block; margin-bottom: 5px; color: var(--warning-color); }
+
+        .tip {
+            background-color: #d4edda;
+            border-color: var(--success-color);
+        }
+        .tip::before { content: "💡 PRO-TIP"; font-weight: bold; display: block; margin-bottom: 5px; color: var(--success-color); }
+
+        /* Graph Container */
+        .graph-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            background: white;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: auto;
+        }
+
+        /* Mini Exercise Styling */
+        .exercise {
+            background-color: #f9f9f9;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        
+        .exercise-btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .exercise-btn:hover {
+            background-color: var(--accent-color);
+        }
+
+        .solution {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #eef;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 12px;
+            text-align: left;
+        }
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        code {
+            font-family: 'Fira Code', monospace;
+            background-color: #eee;
+            padding: 2px 5px;
+            border-radius: 3px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Chapitre 12 : Synthèse et Problèmes d'Examen</h1>
+    <p>
+        Ce module est une synthèse avancée conçue pour la préparation aux examens. Il traite des cas limites des chaînes de Markov :
+        paramétrage probabiliste, espaces d'états infinis et propriétés matricielles spéciales.
+    </p>
+
+    <!-- SECTION 1 -->
+    <h2>12.1. La Marche Aléatoire du Robot</h2>
+
+    <div class="definition">
+        <strong>Le Problème :</strong> Un robot se déplace sur 3 secteurs circulaires.
+        <ul>
+            <li>Probabilité $p$ : Sens horaire ($i \to i+1$).</li>
+            <li>Probabilité $1-p$ : Sens antihoraire ($i \to i-1$).</li>
+        </ul>
+    </div>
+
+    <h3>Visualisation du Système</h3>
+    <p>Le graphe ci-dessous est généré dynamiquement à partir de la modélisation du problème.</p>
+    
+    <div id="graph-robot" class="graph-container">Chargement du diagramme...</div>
+
+    <h3>Analyse de l'Ergodicité</h3>
+    <p>La matrice de transition est :
+    $$
+    P = \begin{pmatrix}
+    0 & p & 1-p \\
+    1-p & 0 & p \\
+    p & 1-p & 0
+    \end{pmatrix}
+    $$
+    </p>
+
+    <div class="vigilance">
+        <p><strong>Attention aux cas limites :</strong></p>
+        <ul>
+            <li>Si $p \in ]0, 1[$ : La chaîne est <strong>Ergodique</strong> (Irréductible + Apériodique).</li>
+            <li>Si $p = 1$ ou $p = 0$ : La chaîne est <strong>Périodique</strong> (de période $d=3$). Elle ne converge pas vers une limite unique.</li>
+        </ul>
+    </div>
+
+    <!-- MINI EXERCICE 1 -->
+    <div class="exercise">
+        <h4>🎯 Mini-Exercice 1 : Intuition Physique</h4>
+        <p>
+            Si l'on pose $p = 0.5$, le robot joue à pile ou face pour choisir sa direction à chaque étape.
+            Intuitivement, quelle sera la probabilité de trouver le robot dans le <strong>Secteur 2</strong> après un très grand nombre d'étapes ($n \to \infty$) ?
+        </p>
+        <button class="exercise-btn" onclick="toggleSolution('sol1')">Voir la réponse</button>
+        <div id="sol1" class="solution">
+            <p><strong>Réponse :</strong> $\pi_2 = 1/3$.</p>
+            <p>
+                <strong>Explication :</strong> Comme $p=0.5 \in ]0,1[$, la chaîne est ergodique. Le système est parfaitement symétrique. Le robot n'a aucune préférence structurelle pour un secteur particulier. La distribution stationnaire est donc uniforme : $\pi = (1/3, 1/3, 1/3)$.
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- SECTION 2 -->
+    <h2>12.2. Matrices Infinies et Séries Harmoniques</h2>
+
+    <p>Dans cet exercice, nous explorons un espace d'états infini $S = \{0, 1, 2, \dots\}$. C'est un modèle classique de file d'attente ou de buffer avec réinitialisation.</p>
+
+    <h3>Structure des Transitions</h3>
+    <ul>
+        <li><strong>Depuis l'état 0 :</strong> On peut sauter vers n'importe quel état $j$ avec une probabilité décroissante $P_{0j} = \frac{1}{(j+1)(j+2)}$.</li>
+        <li><strong>Depuis l'état $j \ge 1$ :</strong> Le retour vers 0 est déterministe, pas à pas ($j \to j-1$).</li>
+    </ul>
+
+    <div id="graph-infinite" class="graph-container">Chargement du diagramme...</div>
+
+    <h3>Le Paradoxe de la Récurrence Nulle</h3>
+    <p>
+        En résolvant les équations de balance $\pi = \pi P$, on obtient la relation :
+        $$ \pi_k = \frac{\pi_0}{k+1} $$
+    </p>
+
+    <div class="tip">
+        <p>Pour qu'une distribution stationnaire existe, la somme des probabilités doit valoir 1 : $\sum_{k=0}^{\infty} \pi_k = 1$.</p>
+    </div>
+
+    <p>
+        Or, ici :
+        $$ \sum_{k=0}^{\infty} \frac{\pi_0}{k+1} = \pi_0 \underbrace{\sum_{n=1}^{\infty} \frac{1}{n}}_{\text{Série Harmonique}} $$
+    </p>
+
+    <!-- MINI EXERCICE 2 -->
+    <div class="exercise">
+        <h4>🎯 Mini-Exercice 2 : Analyse Mathématique</h4>
+        <p>La série harmonique $\sum \frac{1}{n}$ converge-t-elle ou diverge-t-elle ? Quelle conséquence cela a-t-il pour notre robot ?</p>
+        <button class="exercise-btn" onclick="toggleSolution('sol2')">Voir la réponse</button>
+        <div id="sol2" class="solution">
+            <p><strong>Réponse :</strong> Elle diverge vers $+\infty$.</p>
+            <p>
+                <strong>Conséquence :</strong> L'équation devient $\pi_0 \times \infty = 1$. La seule solution mathématique est $\pi_0 = 0$, ce qui implique $\pi_k = 0$ partout.
+                C'est impossible pour une probabilité. On dit que la chaîne est <strong>Récurrente Nulle</strong> : le robot reviendra toujours à 0 (probabilité 1), mais le temps moyen pour revenir est infini.
+            </p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- SECTION 3 -->
+    <h2>12.3. Matrices Doublement Stochastiques</h2>
+
+    <div class="definition">
+        Une matrice est <strong>Doublement Stochastique</strong> si :
+        <ol>
+            <li>La somme de chaque <strong>ligne</strong> vaut 1 (condition standard).</li>
+            <li>La somme de chaque <strong>colonne</strong> vaut 1.</li>
+        </ol>
+    </div>
+
+    <h3>Théorème Fondamental</h3>
+    <p>
+        Si une matrice de transition $P$ (taille $N \times N$) est doublement stochastique et irréductible, alors sa distribution stationnaire est <strong>toujours uniforme</strong> :
+        $$ \pi = \left( \frac{1}{N}, \frac{1}{N}, \dots, \frac{1}{N} \right) $$
+    </p>
+
+    <!-- MINI EXERCICE 3 -->
+    <div class="exercise">
+        <h4>🎯 Mini-Exercice 3 : Application Directe</h4>
+        <p>Soit la matrice suivante :</p>
+        $$
+        M = \begin{pmatrix}
+        0.1 & 0.4 & 0.5 \\
+        0.5 & 0.1 & 0.4 \\
+        0.4 & 0.5 & 0.1
+        \end{pmatrix}
+        $$
+        <p>Sans aucun calcul matriciel, donnez la distribution stationnaire $\pi$.</p>
+        <button class="exercise-btn" onclick="toggleSolution('sol3')">Voir la réponse</button>
+        <div id="sol3" class="solution">
+            <p><strong>Vérification :</strong></p>
+            <ul>
+                <li>Somme Lignes = 1 (OK)</li>
+                <li>Col 1 : $0.1+0.5+0.4=1$</li>
+                <li>Col 2 : $0.4+0.1+0.5=1$</li>
+                <li>Col 3 : $0.5+0.4+0.1=1$</li>
+            </ul>
+            <p><strong>Conclusion :</strong> La matrice est doublement stochastique. Puisqu'elle est de taille $3 \times 3$, alors $\pi = (1/3, 1/3, 1/3)$.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- SECTION 4: CORRIGÉS DÉTAILLÉS -->
+    <h2>📂 Corrigés Détaillés des Travaux Dirigés</h2>
+    <p>Cette section détaille les étapes de calcul pour les exercices complexes vus plus haut.</p>
+
+    <h3>A. Résolution du Robot (Système d'équations)</h3>
+    <table>
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Action / Équation</th>
+                <th>Explication</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1</td>
+                <td>Poser $\pi P = \pi$</td>
+                <td>Équations de balance globale.</td>
+            </tr>
+            <tr>
+                <td>2</td>
+                <td>$\pi_1 = (1-p)\pi_2 + p\pi_3$</td>
+                <td>Flux entrant en 1 (vient de 2 sens antihoraire, de 3 sens horaire).</td>
+            </tr>
+            <tr>
+                <td>3</td>
+                <td>Hypothèse de Symétrie</td>
+                <td>On suppose $\pi_1 = \pi_2 = \pi_3 = \pi^*$.</td>
+            </tr>
+            <tr>
+                <td>4</td>
+                <td>Verification</td>
+                <td>$\pi^* = (1-p)\pi^* + p\pi^* \implies \pi^* = \pi^*(1-p+p) \implies \pi^* = \pi^*$. (Toujours vrai).</td>
+            </tr>
+            <tr>
+                <td>5</td>
+                <td>Normalisation</td>
+                <td>$3\pi^* = 1 \implies \pi^* = 1/3$.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <h3>B. Série Télescopique (Matrice Infinie)</h3>
+    <p>Détail du calcul de la somme pour le terme $\pi_k$.</p>
+    <div class="box">
+        On cherche à calculer $S_k = \sum_{j=0}^{k-1} P_{0j}$. Sachant que $P_{0j} = \frac{1}{(j+1)(j+2)}$.<br><br>
+        <strong>1. Décomposition en éléments simples :</strong><br>
+        $$ \frac{1}{(j+1)(j+2)} = \frac{1}{j+1} - \frac{1}{j+2} $$
+        <br>
+        <strong>2. Somme Télescopique :</strong><br>
+        $$
+        \begin{aligned}
+        S_k &= \left(\frac{1}{1} - \frac{1}{2}\right) + \left(\frac{1}{2} - \frac{1}{3}\right) + \dots + \left(\frac{1}{k} - \frac{1}{k+1}\right) \\
+        S_k &= 1 - \frac{1}{k+1}
+        \end{aligned}
+        $$
+        <br>
+        <strong>3. Injection dans la formule de récurrence :</strong><br>
+        $$ \pi_k = \pi_0 (1 - S_k) = \pi_0 \left( 1 - \left(1 - \frac{1}{k+1}\right) \right) = \frac{\pi_0}{k+1} $$
+    </div>
+
+</div>
+
+<!-- SCRIPTS -->
+<script type="module">
+    // Import Viz.js for Dot rendering
+    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+
+    // 1. Render DOT Code for the Robot
+    const robotDotCode = `digraph RobotWalk {
+        layout=circo;
+        rankdir=LR;
+        node [shape=circle, style="filled", fillcolor="#e8f4fd", fontname="Roboto", fontsize=12, fixedsize=true, width=1.2, penwidth=2, color="#2c3e50"];
+        edge [fontname="Roboto", fontsize=10, penwidth=1.5];
+
+        1 [label="Secteur 1"];
+        2 [label="Secteur 2"];
+        3 [label="Secteur 3"];
+
+        // Horaire (Bleu)
+        1 -> 2 [label="p", color="#3498db", fontcolor="#3498db"];
+        2 -> 3 [label="p", color="#3498db", fontcolor="#3498db"];
+        3 -> 1 [label="p", color="#3498db", fontcolor="#3498db"];
+
+        // Antihoraire (Rouge)
+        1 -> 3 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
+        3 -> 2 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
+        2 -> 1 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
+    }`;
+
+    // 2. Render DOT Code for Infinite Matrix
+    const infiniteDotCode = `digraph InfiniteChain {
+        rankdir=LR;
+        bgcolor="transparent";
+        node [shape=circle, style=filled, fillcolor="white", fontname="Roboto", color="#2c3e50"];
+        edge [fontname="Roboto", fontsize=10];
+        
+        0 [label="0", fillcolor="#fff3cd", penwidth=2];
+        1 [label="1"];
+        2 [label="2"];
+        3 [label="3"];
+        inf [label="...", shape=none, style=none];
+
+        {rank=same; 0; 1; 2; 3; inf}
+
+        // Retour Deterministe
+        1 -> 0 [label="1", weight=2];
+        2 -> 1 [label="1", weight=2];
+        3 -> 2 [label="1", weight=2];
+        inf -> 3 [label="1", style=dashed, weight=2];
+
+        // Sauts Probabilistes
+        0 -> 0 [label="1/2", dir=back]; 
+        0 -> 1 [label="1/6", constraint=false, color="#3498db", fontcolor="#3498db"];
+        0 -> 2 [label="1/12", constraint=false, color="#3498db", fontcolor="#3498db"];
+        0 -> 3 [label="1/20", constraint=false, color="#3498db", fontcolor="#3498db"];
+    }`;
+
+    // Function to render
+    async function renderGraphs() {
+        try {
+            const viz = await instance();
+            
+            // Render Robot
+            const svgRobot = viz.renderString(robotDotCode, { engine: 'circo', format: 'svg' });
+            document.getElementById('graph-robot').innerHTML = svgRobot;
+
+            // Render Infinite
+            const svgInfinite = viz.renderString(infiniteDotCode, { engine: 'dot', format: 'svg' });
+            document.getElementById('graph-infinite').innerHTML = svgInfinite;
+
+        } catch (err) {
+            console.error(err);
+            document.getElementById('graph-robot').innerHTML = "Erreur de chargement du graphe.";
+        }
+    }
+
+    // Execute
+    renderGraphs();
+</script>
+
+<script>
+    // Function to toggle solution visibility
+    function toggleSolution(id) {
+        var x = document.getElementById(id);
+        if (x.style.display === "block") {
+            x.style.display = "none";
+        } else {
+            x.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

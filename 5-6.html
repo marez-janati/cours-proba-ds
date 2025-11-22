@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours Interactif : Chaînes de Markov (DTMC)</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+    MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+      }
+    };
+    </script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            --light: #ecf0f1;
+            --bg: #f4f7f6;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: var(--bg);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+        }
+
+        h1, h2, h3 { color: var(--primary); }
+        h1 { text-align: center; border-bottom: 3px solid var(--accent); padding-bottom: 10px; margin-bottom: 30px; }
+        h2 { border-left: 5px solid var(--accent); padding-left: 10px; margin-top: 40px; background: #eaf2f8; padding: 10px; }
+
+        /* Pedagogical Boxes */
+        .box {
+            padding: 15px;
+            border-radius: 6px;
+            margin: 20px 0;
+            border-left: 5px solid;
+        }
+        .def { background-color: #e8f4fd; border-color: var(--accent); }
+        .vigilance { background-color: #fff3cd; border-color: var(--warning); }
+        .tip { background-color: #e9f7ef; border-color: var(--success); }
+        
+        .box h4 { margin-top: 0; display: flex; align-items: center; gap: 10px; }
+
+        /* Mini Exercises */
+        .exercise {
+            background: #fff;
+            border: 2px dashed var(--primary);
+            padding: 20px;
+            border-radius: 8px;
+            margin: 25px 0;
+        }
+        .exercise-header { font-weight: bold; color: var(--primary); margin-bottom: 10px; }
+        .solution-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.9em;
+            transition: background 0.3s;
+        }
+        .solution-btn:hover { background-color: #1a252f; }
+        .solution-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-left: 3px solid var(--success);
+        }
+
+        /* Graph Containers */
+        .graph-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            background: white;
+            overflow-x: auto;
+        }
+        .graph-source { display: none; } /* Hidden text areas for graph code */
+
+        /* Tables for Solutions */
+        table.sol-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 10px;
+        }
+        table.sol-table th, table.sol-table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table.sol-table th { background-color: var(--accent); color: white; }
+        table.sol-table tr:nth-child(even) { background-color: #f2f2f2; }
+
+        code { background: #f1f1f1; padding: 2px 5px; border-radius: 3px; font-family: monospace; color: #c7254e; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Partie II : Chaînes de Markov à Temps Discret (DTMC)</h1>
+    <p class="intro">
+        Ce module couvre les fondements des systèmes stochastiques évoluant par étapes discrètes. Nous explorerons la structure matricielle, la visualisation graphique et le comportement à long terme (régime stationnaire).
+    </p>
+
+    <!-- ================= CHAPTER 5 ================= -->
+    <h2>Chapitre 5 : Structure et Classification</h2>
+
+    <div class="box def">
+        <h4>📘 Définition : La Propriété de Markov</h4>
+        <p>Un système possède la propriété de Markov (ou "absence de mémoire") si la prédiction du futur ne dépend que de l'état <strong>présent</strong>, et non de l'historique passé.</p>
+        $$ P(X_{n+1} = j \mid X_n = i, \dots, X_0 = i_0) = P(X_{n+1} = j \mid X_n = i) = p_{ij} $$
+    </div>
+
+    <h3>5.1. La Matrice de Transition $P$</h3>
+    <p>La dynamique du système est entièrement décrite par une matrice carrée $P$ où l'élément $p_{ij}$ représente la probabilité de passer de l'état $i$ à l'état $j$.</p>
+
+    <div class="box vigilance">
+        <h4>⚠️ Zone de Vigilance : Propriétés de la Matrice</h4>
+        <ul>
+            <li>Les probabilités doivent être entre 0 et 1 : $0 \le p_{ij} \le 1$.</li>
+            <li><strong>La somme de chaque ligne doit valoir exactement 1</strong> ($\sum_{j} p_{ij} = 1$).</li>
+            <li>La somme des colonnes n'a pas d'obligation particulière (sauf cas doublement stochastique).</li>
+        </ul>
+    </div>
+
+    <!-- MINI EXERCISE 1 -->
+    <div class="exercise">
+        <div class="exercise-header">🎯 Mini-Exercice 1 : Validité d'une Matrice</div>
+        <p>La matrice suivante est-elle une matrice de transition valide pour une chaîne à 2 états ?</p>
+        $$ M = \begin{pmatrix} 0.5 & 0.5 \\ 0.2 & 0.9 \end{pmatrix} $$
+        <button class="solution-btn" onclick="toggle('sol-1')">Voir la réponse</button>
+        <div id="sol-1" class="solution-content">
+            <strong>Réponse : NON.</strong>
+            <br>Vérifions les lignes :
+            <ul>
+                <li>Ligne 1 : $0.5 + 0.5 = 1$ ✅</li>
+                <li>Ligne 2 : $0.2 + 0.9 = 1.1 \neq 1$ ❌</li>
+            </ul>
+            La probabilité totale de quitter l'état 2 dépasse 100%, ce qui est impossible.
+        </div>
+    </div>
+
+    <h3>5.2. Représentation Graphique</h3>
+    <p>Les états sont des nœuds et les transitions positives ($p_{ij} > 0$) sont des arcs orientés.</p>
+
+    <h4>Exemple : Le "Jeu du Joueur" (Gambler's Ruin)</h4>
+    <p>Un joueur mise 1€ : il gagne (prob $p$) ou perd (prob $1-p$). Il s'arrête s'il atteint 0€ (Ruine) ou 3€ (Victoire).</p>
+    
+    <!-- GRAPH RENDERING AREA -->
+    <div class="graph-container" id="graph-gambler"></div>
+    <textarea class="graph-source" data-target="graph-gambler">
+digraph Gambler {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [fontname="Arial"];
+    
+    node [shape=doublecircle, style=filled, fillcolor="#e0e0e0"];
+    0 [label="0 (Ruine)"]; 
+    3 [label="3 (Victoire)"];
+    
+    node [shape=circle, style=filled, fillcolor="white"];
+    1; 2;
+
+    0 -> 0 [label="1"];
+    1 -> 0 [label="1-p"];
+    1 -> 2 [label="p"];
+    2 -> 1 [label="1-p"];
+    2 -> 3 [label="p"];
+    3 -> 3 [label="1"];
+}
+    </textarea>
+
+    <h3>5.3. Classification des États</h3>
+    <p>Pour comprendre l'évolution à long terme, il faut classer les états :</p>
+    <ul>
+        <li><strong>Transitoire :</strong> Une fois quitté, il est possible de ne jamais y revenir.</li>
+        <li><strong>Récurrent :</strong> Le système finira par y revenir avec une probabilité de 1.</li>
+        <li><strong>Absorbant :</strong> Un état qu'on ne peut plus quitter ($p_{ii} = 1$).</li>
+    </ul>
+
+    <h4>Analyse de Classes (Graphe Complexe)</h4>
+    <p>Observez les connexions dans le graphe ci-dessous. Identifiez les "groupes" d'états qui communiquent entre eux.</p>
+
+    <!-- GRAPH RENDERING AREA -->
+    <div class="graph-container" id="graph-class"></div>
+    <textarea class="graph-source" data-target="graph-class">
+digraph Classification {
+    rankdir=TB; 
+    bgcolor="transparent";
+    node [shape=circle, fontname="Arial"];
+
+    1 [style=dashed, label="1 (T)"]; 
+    2 [style=dashed, label="2 (T)"];
+    
+    node [style=solid, penwidth=2, fillcolor="#e8f4fd", style=filled];
+    3;4;5;6;7;
+    
+    1 -> 2 [label="2/3"];
+    1 -> 3 [label="1/3"];
+    2 -> 6 [label="1/3"];
+    
+    subgraph cluster_C3 {
+        style=invis;
+        3 -> 4 [label="2/3"];
+        3 -> 5 [label="1/3"];
+        4 -> 3 [label="1/3"];
+        4 -> 5 [label="2/3"];
+        5 -> 3 [label="2/3"];
+        5 -> 4 [label="1/3"];
+    }
+
+    subgraph cluster_C4 {
+        style=invis;
+        6 -> 6 [label="1/2"];
+        6 -> 7 [label="1/2"];
+        7 -> 6 [label="1"];
+    }
+}
+    </textarea>
+
+    <!-- MINI EXERCISE 2 -->
+    <div class="exercise">
+        <div class="exercise-header">🧠 Mini-Exercice 2 : Lecture de Graphe</div>
+        <p>Dans le graphe ci-dessus, si le système démarre à l'état <strong>2</strong>, peut-il atteindre l'état <strong>5</strong> ?</p>
+        <button class="solution-btn" onclick="toggle('sol-2')">Voir la réponse</button>
+        <div id="sol-2" class="solution-content">
+            <strong>Réponse : NON.</strong>
+            <br>
+            Regardez les flèches partant de l'état 2. La seule transition sortante mène à l'état 6.
+            <br>Une fois en 6, on peut aller en 7 et revenir en 6. Il n'y a aucun chemin (suite de flèches) qui relie le groupe {6, 7} au groupe {3, 4, 5}.
+        </div>
+    </div>
+
+    <!-- ================= CHAPTER 6 ================= -->
+    <h2>Chapitre 6 : Calculs et Régime Stationnaire</h2>
+
+    <h3>6.1. Distributions Transitoires</h3>
+    <p>Si $\Pi_0$ est le vecteur de probabilité initial, l'état à l'étape $n$ est donné par :</p>
+    $$ \Pi_{n} = \Pi_0 \times P^n $$
+
+    <h3>6.2. Distribution Stationnaire ($\Pi$)</h3>
+    <div class="box tip">
+        <h4>💡 Pro-Tip : L'Équilibre</h4>
+        <p>Le régime stationnaire représente l'état "d'équilibre" du système après un temps très long. C'est une distribution de probabilité constante.</p>
+    </div>
+    
+    <p>Pour trouver $\Pi = [\pi_1, \pi_2, \dots]$, on résout le système linéaire :</p>
+    <ol>
+        <li>$\Pi = \Pi P$ (Invariance)</li>
+        <li>$\sum \pi_i = 1$ (Normalisation)</li>
+    </ol>
+
+    <!-- MINI EXERCISE 3 -->
+    <div class="exercise">
+        <div class="exercise-header">✏️ Mini-Exercice 3 : Calcul Stationnaire</div>
+        <p>Soit la matrice $P = \begin{pmatrix} 0.5 & 0.5 \\ 1 & 0 \end{pmatrix}$. Trouvez la distribution stationnaire $(\pi_1, \pi_2)$.</p>
+        <button class="solution-btn" onclick="toggle('sol-3')">Voir la réponse</button>
+        <div id="sol-3" class="solution-content">
+            <strong>Résolution :</strong>
+            <br>
+            1. Équation : $(\pi_1, \pi_2) = (\pi_1, \pi_2) \times P$
+            $$ \begin{cases} \pi_1 = 0.5\pi_1 + 1\pi_2 \\ \pi_2 = 0.5\pi_1 + 0\pi_2 \end{cases} $$
+            2. De la 2ème ligne : $\pi_2 = 0.5\pi_1$.
+            <br>
+            3. Normalisation : $\pi_1 + \pi_2 = 1$.
+            <br>
+            Substituons : $\pi_1 + 0.5\pi_1 = 1 \implies 1.5\pi_1 = 1 \implies \pi_1 = 2/3$.
+            <br>
+            Donc $\pi_2 = 1/3$.
+            <br>
+            <strong>$\Pi = [2/3, 1/3]$</strong>.
+        </div>
+    </div>
+
+    <h3>6.3. Étude de Cas : La File d'Attente avec Perte</h3>
+    <p>Modélisation d'un buffer (taille $K$) où les paquets arrivent (prob $a$) et sont servis (prob $1-p$). Si le buffer est plein, les nouveaux paquets sont perdus.</p>
+    
+    <!-- GRAPH RENDERING AREA -->
+    <div class="graph-container" id="graph-queue"></div>
+    <textarea class="graph-source" data-target="graph-queue">
+digraph PacketQueue {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [shape=circle, style=filled, fillcolor="#e6f3ff", fontname="Arial"];
+    
+    0 [label="0"];
+    1 [label="1"];
+    2 [label="2"];
+    dots [label="...", shape=none, style=none, width=0.5];
+    k [label="k"];
+    k1 [label="k+1"];
+
+    // Montée (Arrivée + Échec Service)
+    0 -> 1 [label="ap"];
+    1 -> 2 [label="ap"];
+    2 -> dots [label="ap"];
+    dots -> k [label="ap"];
+    k -> k1 [label="ap"];
+    
+    // Descente (Pas d'arrivée + Succès Service)
+    1 -> 0 [label="(1-a)(1-p)"];
+    2 -> 1 [label="(1-a)(1-p)"];
+    dots -> 2 [label="(1-a)(1-p)"];
+    k -> dots [label="(1-a)(1-p)"];
+    k1 -> k [label="(1-a)(1-p)"];
+}
+    </textarea>
+
+    <div class="box vigilance">
+        <h4>⚠️ Condition de Stabilité</h4>
+        <p>Pour que la file ne sature pas indéfiniment (dans le cas d'une file infinie), il faut que le "débit d'entrée" soit inférieur au "débit de sortie".</p>
+        $$ a < 1-p $$
+        <small>(Taux d'arrivée < Taux de service)</small>
+    </div>
+
+    <!-- ================= SOLUTIONS SECTION ================= -->
+    <h2 id="corriges">📝 Corrigés Détaillés des Travaux Dirigés</h2>
+    
+    <p>Voici les solutions détaillées, étape par étape, des exemples complexes vus dans le cours.</p>
+
+    <h3>Exercice A : Classification Complète des États</h3>
+    <p><strong>Objectif :</strong> Analyser le graphe de la section 5.3 et déterminer les classes.</p>
+    
+    <table class="sol-table">
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Analyse</th>
+                <th>Conclusion</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. État 1</td>
+                <td>On peut aller vers 2 et 3. Une fois en 3, on est piégé dans {3,4,5}. Une fois en 2, on va vers 6. Impossible de revenir en 1.</td>
+                <td><strong>Transitoire</strong></td>
+            </tr>
+            <tr>
+                <td>2. État 2</td>
+                <td>Mène obligatoirement à 6. Le groupe {6,7} est clos. Impossible de revenir en 2.</td>
+                <td><strong>Transitoire</strong></td>
+            </tr>
+            <tr>
+                <td>3. Classe {3,4,5}</td>
+                <td>3 va à 4 et 5. 4 va à 3 et 5. 5 va à 3 et 4. Ils communiquent tous entre eux. Aucune flèche ne sort de ce groupe vers l'extérieur.</td>
+                <td><strong>Classe Récurrente Fermée</strong></td>
+            </tr>
+            <tr>
+                <td>4. Classe {6,7}</td>
+                <td>6 et 7 forment une boucle fermée. Impossible d'en sortir.</td>
+                <td><strong>Classe Récurrente Fermée</strong></td>
+            </tr>
+        </tbody>
+    </table>
+    <p><em>Conclusion Globale :</em> La chaîne n'est pas irréductible car elle possède plusieurs classes fermées disjointes.</p>
+
+    <h3>Exercice B : Résolution de la File d'Attente (Géométrique)</h3>
+    <p><strong>Objectif :</strong> Trouver la probabilité $\pi_k$ qu'il y ait $k$ paquets dans le système.</p>
+
+    <table class="sol-table">
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Formule / Action</th>
+                <th>Résultat Intermédiaire</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Équation de Coupe</td>
+                <td>Le flux qui passe de l'état $k$ à $k+1$ doit égaler le flux qui revient de $k+1$ à $k$ (équilibre local).</td>
+                <td>$\pi_k \cdot (ap) = \pi_{k+1} \cdot (1-a)(1-p)$</td>
+            </tr>
+            <tr>
+                <td>2. Définition de la raison</td>
+                <td>On isole $\pi_{k+1}$ pour trouver la relation de récurrence.</td>
+                <td>$\pi_{k+1} = \pi_k \cdot \frac{ap}{(1-a)(1-p)}$<br>Posons $q = \frac{ap}{(1-a)(1-p)}$</td>
+            </tr>
+            <tr>
+                <td>3. Solution Générale</td>
+                <td>C'est une suite géométrique.</td>
+                <td>$\pi_k = \pi_0 \cdot q^k$</td>
+            </tr>
+            <tr>
+                <td>4. Trouver $\pi_0$</td>
+                <td>On utilise la somme des probabilités : $\sum_{k=0}^{\infty} \pi_k = 1$.<br>Somme d'une série géométrique : $\frac{1}{1-q}$.</td>
+                <td>$\pi_0 ( \frac{1}{1-q} ) = 1 \implies \mathbf{\pi_0 = 1 - q}$</td>
+            </tr>
+        </tbody>
+    </table>
+    <p><strong>Formule Finale :</strong> $\pi_k = (1-q)q^k$ (Loi Géométrique).</p>
+
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script type="module">
+    // Import Libraries
+    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+    // Render Dot Function
+    async function renderDot(code, containerId) {
+        const container = document.getElementById(containerId);
+        if (!container) return;
+        container.innerHTML = '<div style="color:gray;">Génération du graphique...</div>';
+        try {
+            const viz = await instance();
+            const svg = viz.renderString(code, { engine: 'dot', format: 'svg' });
+            container.innerHTML = svg;
+        } catch (err) {
+            container.innerHTML = `<p style="color:red">Erreur Dot: ${err.message}</p>`;
+        }
+    }
+
+    // Main Logic to Find and Render Graphs
+    async function renderAllGraphs() {
+        const sources = document.querySelectorAll('.graph-source');
+        
+        for (const source of sources) {
+            const targetId = source.getAttribute('data-target');
+            const code = source.value;
+            // We assume all our examples here are DOT for stability with the provided text
+            await renderDot(code, targetId);
+        }
+    }
+
+    // Run on load
+    window.addEventListener('DOMContentLoaded', () => {
+        renderAllGraphs();
+    });
+</script>
+
+<script>
+    // Simple function for toggling solutions (Non-module script)
+    function toggle(id) {
+        var x = document.getElementById(id);
+        if (x.style.display === "block") {
+            x.style.display = "none";
+        } else {
+            x.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

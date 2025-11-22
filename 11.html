@@ -1,0 +1,557 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 11 : Théorie des Files d'Attente - Cours Interactif</title>
+    
+    <!-- MathJax Configuration -->
+    <script>
+    window.MathJax = {
+        tex: {
+            inlineMath: [['$', '$'], ['\\(', '\\)']],
+            displayMath: [['$$', '$$'], ['\\[', '\\]']],
+            processEscapes: true
+        },
+        svg: {
+            fontCache: 'global'
+        }
+    };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #3498db;
+            --success: #27ae60;
+            --warning: #f39c12;
+            --danger: #c0392b;
+            --light: #ecf0f1;
+            --dark: #2c3e50;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary);
+            margin-top: 1.5em;
+        }
+
+        h1 {
+            text-align: center;
+            border-bottom: 3px solid var(--accent);
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+
+        h2 {
+            border-left: 5px solid var(--accent);
+            padding-left: 15px;
+            background: #fff;
+            padding: 10px 15px;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Pedagogical Boxes */
+        .box {
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            border-left: 5px solid;
+        }
+
+        .definition {
+            background-color: #e8f6f3;
+            border-color: var(--accent);
+        }
+
+        .definition h4 { margin-top: 0; color: var(--accent); }
+
+        .vigilance {
+            background-color: #fdedec;
+            border-color: var(--danger);
+        }
+
+        .vigilance h4 { margin-top: 0; color: var(--danger); }
+
+        .tip {
+            background-color: #fef9e7;
+            border-color: var(--warning);
+        }
+
+        .tip h4 { margin-top: 0; color: var(--warning); }
+
+        /* Mini Exercise Styles */
+        .mini-exercise {
+            background-color: #fff;
+            border: 2px solid var(--primary);
+            border-radius: 8px;
+            padding: 20px;
+            margin: 30px 0;
+        }
+
+        .mini-exercise h4 {
+            margin-top: 0;
+            color: var(--primary);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .toggle-btn {
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .toggle-btn:hover {
+            background-color: #2980b9;
+        }
+
+        .solution {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f4f6f7;
+            border-left: 3px solid var(--success);
+        }
+
+        /* Graph Containers */
+        .graph-container {
+            text-align: center;
+            margin: 20px 0;
+            background: white;
+            padding: 10px;
+            border-radius: 8px;
+            border: 1px dashed #ccc;
+            overflow-x: auto;
+        }
+
+        /* Tables for Solutions */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+
+        tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Chapitre 11 : Théorie des Files d'Attente</h1>
+
+    <p class="intro">
+        Ce chapitre formalise l'étude des systèmes d'attente. Initialement développés par <strong>Agner Krarup Erlang</strong> pour la téléphonie, ces concepts sont fondamentaux pour comprendre la latence dans les réseaux informatiques, les performances des bases de données et la gestion des processus.
+    </p>
+
+    <!-- ================================================================= -->
+    <!-- 11.1 Caractérisation -->
+    <!-- ================================================================= -->
+    
+    <h2>11.1. Caractérisation et Notation de Kendall</h2>
+
+    <p>Pour modéliser mathématiquement une file d'attente (FA), nous devons définir ses composantes probabilistes.</p>
+
+    <div class="box definition">
+        <h4>📘 Définitions Clés</h4>
+        <ul>
+            <li><strong>$\lambda$ (Taux d'arrivée)</strong> : Nombre moyen de clients arrivant par unité de temps.</li>
+            <li><strong>$\mu$ (Taux de service)</strong> : Nombre moyen de clients qu'un serveur peut traiter par unité de temps (s'il travaille en continu).</li>
+            <li><strong>Temps moyen de service</strong> = $1 / \mu$.</li>
+        </ul>
+    </div>
+
+    <h3>La Notation de Kendall : $A / B / m / K / n / D$</h3>
+    <p>Cette notation standardisée (ex: M/M/1) résume les caractéristiques du système :</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Symbole</th>
+                <th>Signification</th>
+                <th>Valeurs usuelles</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>A</strong></td>
+                <td>Loi des Arrivées</td>
+                <td><strong>M</strong> (Markovien/Poisson), <strong>D</strong> (Déterministe), <strong>G</strong> (Général)</td>
+            </tr>
+            <tr>
+                <td><strong>B</strong></td>
+                <td>Loi de Service</td>
+                <td><strong>M</strong> (Exponentielle), <strong>D</strong> (Constant), <strong>G</strong> (Général)</td>
+            </tr>
+            <tr>
+                <td><strong>m</strong></td>
+                <td>Nombre de Serveurs</td>
+                <td>1, 2, ..., $\infty$</td>
+            </tr>
+            <tr>
+                <td><strong>K</strong></td>
+                <td>Capacité du système</td>
+                <td>$\infty$ (par défaut), ou entier positif (file limitée)</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="box vigilance">
+        <h4>⚠️ Zone de Vigilance : Unités</h4>
+        <p>Ne confondez jamais le <strong>taux</strong> ($\mu$, en clients/seconde) avec le <strong>temps</strong> ($1/\mu$, en secondes).<br>
+        Si le traitement dure 50 ms, alors $\mu = 1 / 0.05 = 20$ clients/seconde.</p>
+    </div>
+
+    <!-- Mini Exercice 1 -->
+    <div class="mini-exercise">
+        <h4>🎓 Mini-Exercice 1 : Notation de Kendall</h4>
+        <p>Un routeur reçoit des paquets selon un processus de Poisson. La taille des paquets est fixe (constante), donc le temps de traitement est constant. Il y a un seul processeur de sortie. Le buffer est infini.</p>
+        <p><strong>Question :</strong> Quelle est la notation de Kendall de ce système ?</p>
+        
+        <button class="toggle-btn" onclick="toggleSolution('sol1')">Voir la solution</button>
+        <div id="sol1" class="solution">
+            <p><strong>Réponse : M/D/1</strong></p>
+            <ul>
+                <li><strong>M</strong> : Arrivées de Poisson (Memoryless).</li>
+                <li><strong>D</strong> : Temps de service Déterministe (constant).</li>
+                <li><strong>1</strong> : Un seul serveur (processeur).</li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- 11.2 File M/M/1 -->
+    <!-- ================================================================= -->
+
+    <h2>11.2. La File M/M/1</h2>
+    <p>Le modèle le plus fondamental : arrivées de Poisson, services exponentiels, 1 serveur. Il se modélise par une <strong>Chaîne de Markov à Temps Continu (CTMC)</strong>.</p>
+
+    <h3>Visualisation du Processus de Naissance et de Mort</h3>
+    <p>Ci-dessous, le graphe d'états. Chaque cercle représente le nombre de clients dans le système. $\lambda$ fait passer de $k$ à $k+1$ (arrivée), $\mu$ fait passer de $k$ à $k-1$ (départ).</p>
+
+    <!-- Code DOT caché pour le rendu -->
+    <textarea id="dot-mm1" style="display:none;">
+digraph MM1_Queue {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [shape=circle, style=filled, fillcolor="#e8f8f5", fontname="Helvetica", penwidth=2, color="#2c3e50"];
+    edge [fontname="Helvetica", fontsize=12, penwidth=1.5, color="#7f8c8d"];
+
+    0 [label="0"];
+    1 [label="1"];
+    2 [label="2"];
+    3 [label="3"];
+    dots [label="...", shape=none, style=none, fillcolor=none];
+    k [label="k"];
+    kp1 [label="k+1"];
+    dots2 [label="...", shape=none, style=none, fillcolor=none];
+
+    0 -> 1 [label="λ", fontcolor="green"];
+    1 -> 0 [label="μ", fontcolor="red"];
+    1 -> 2 [label="λ", fontcolor="green"];
+    2 -> 1 [label="μ", fontcolor="red"];
+    2 -> 3 [label="λ", fontcolor="green"];
+    3 -> 2 [label="μ", fontcolor="red"];
+    3 -> dots [label="λ", fontcolor="green"];
+    dots -> 3 [label="μ", fontcolor="red"];
+    dots -> k [label="λ", fontcolor="green"];
+    k -> dots [label="μ", fontcolor="red"];
+    k -> kp1 [label="λ", fontcolor="green"];
+    kp1 -> k [label="μ", fontcolor="red"];
+    kp1 -> dots2 [label="λ", fontcolor="green"];
+    dots2 -> kp1 [label="μ", fontcolor="red"];
+}
+    </textarea>
+    <div id="graph-mm1" class="graph-container">Génération du graphe en cours...</div>
+
+    <h3>Stabilité et Distribution Stationnaire</h3>
+    <p>Le système est stable si et seulement si le trafic est inférieur à la capacité de service :</p>
+    <div class="box definition">
+        <h4>Condition de Stabilité</h4>
+        $$ \rho = \frac{\lambda}{\mu} < 1 $$
+    </div>
+
+    <p>La probabilité d'avoir $k$ clients dans le système est donnée par une loi géométrique :</p>
+    $$ \pi_k = (1 - \rho) \rho^k $$
+
+    <!-- Mini Exercice 2 -->
+    <div class="mini-exercise">
+        <h4>🎓 Mini-Exercice 2 : Condition de Stabilité</h4>
+        <p>Un serveur web reçoit 100 requêtes par seconde ($\lambda = 100$). Il met en moyenne 8 ms pour traiter une requête ($1/\mu = 0.008$ s).</p>
+        <p><strong>Question :</strong> Le système va-t-il saturer ?</p>
+        
+        <button class="toggle-btn" onclick="toggleSolution('sol2')">Voir la solution</button>
+        <div id="sol2" class="solution">
+            <p><strong>Calculons $\rho$ :</strong></p>
+            <ol>
+                <li>Calculons le taux de service $\mu$ : $\mu = \frac{1}{0.008} = 125$ requêtes/sec.</li>
+                <li>Calculons l'intensité $\rho$ : $\rho = \frac{100}{125} = 0.8$.</li>
+            </ol>
+            <p><strong>Conclusion :</strong> Comme $\rho = 0.8 < 1$, le système est <strong>stable</strong> (il est occupé 80% du temps).</p>
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- 11.3 Performances -->
+    <!-- ================================================================= -->
+
+    <h2>11.3. Mesures de Performance et Loi de Little</h2>
+
+    <div class="box tip">
+        <h4>💡 Astuce de Pro : La Loi de Little</h4>
+        <p>Mémorisez cette loi universelle : <strong>$N = \lambda W$</strong>.</p>
+        <p>Nombre moyen ($N$) = Taux d'arrivée ($\lambda$) $\times$ Temps moyen de séjour ($W$).<br>
+        Elle s'applique au système entier ($N_s, W_s$) ou juste à la file ($N_q, W_q$).</p>
+    </div>
+
+    <h3>Formules pour M/M/1</h3>
+    <ul>
+        <li><strong>Nombre moyen de clients ($N_s$) :</strong> $$ N_s = \frac{\rho}{1-\rho} $$</li>
+        <li><strong>Temps moyen de séjour ($W_s$) :</strong> $$ W_s = \frac{1}{\mu - \lambda} $$</li>
+    </ul>
+
+    <div class="box vigilance">
+        <h4>⚠️ Le "Mur" de la Performance</h4>
+        <p>Observez la formule de $N_s$. Si $\rho$ passe de 0.9 à 0.99, le nombre de clients ne double pas, il est multiplié par 10 ! C'est le comportement asymptotique près de la saturation.</p>
+    </div>
+
+    <!-- Mini Exercice 3 -->
+    <div class="mini-exercise">
+        <h4>🎓 Mini-Exercice 3 : Temps d'attente</h4>
+        <p>Dans une file M/M/1 avec $\lambda=0.5$ et $\mu=1$. Quel est le temps moyen qu'un client passe <strong>dans le système</strong> ($W_s$) ?</p>
+        
+        <button class="toggle-btn" onclick="toggleSolution('sol3')">Voir la solution</button>
+        <div id="sol3" class="solution">
+            $$ W_s = \frac{1}{\mu - \lambda} = \frac{1}{1 - 0.5} = \frac{1}{0.5} = 2 \text{ unités de temps} $$
+        </div>
+    </div>
+
+    <!-- ================================================================= -->
+    <!-- 11.4 Erlang B -->
+    <!-- ================================================================= -->
+
+    <h2>11.4. Application : Allocation de Canaux (Erlang B)</h2>
+    <p>Le modèle <strong>M/M/N/N</strong> modélise un système <strong>à perte</strong> (pas de file d'attente). Si les N serveurs sont occupés, le client est rejeté.</p>
+
+    <!-- Code DOT caché pour Erlang B -->
+    <textarea id="dot-erlang" style="display:none;">
+digraph Erlang_B {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [shape=circle, style=filled, fillcolor="#eaf2f8", fontname="Helvetica", penwidth=2];
+    edge [fontname="Helvetica", fontsize=10];
+
+    0 [label="0"];
+    1 [label="1"];
+    dots [label="...", shape=none, style=none, fillcolor=none];
+    N [label="N", fillcolor="#f1948a", xlabel="Blocage"];
+
+    0 -> 1 [label="λ"];
+    1 -> 0 [label="μ"];
+    1 -> dots [label="λ"];
+    dots -> 1 [label="2μ"];
+    dots -> N [label="λ"];
+    N -> dots [label="Nμ"];
+}
+    </textarea>
+    <div id="graph-erlang" class="graph-container">Génération du graphe en cours...</div>
+
+    <p>La probabilité de blocage (formule d'Erlang B) est la probabilité d'être dans l'état $N$ :</p>
+    $$ P_B = \frac{\frac{A^N}{N!}}{\sum_{k=0}^N \frac{A^k}{k!}} \quad \text{où } A = \frac{\lambda}{\mu} $$
+
+    <!-- ================================================================= -->
+    <!-- CORRIGES DES EXERCICES -->
+    <!-- ================================================================= -->
+
+    <h2 style="border-color: #27ae60; color: #27ae60;">📝 Corrigés des Travaux Dirigés</h2>
+    <p>Voici des exercices d'application détaillés pas à pas pour maîtriser les concepts.</p>
+
+    <div class="box">
+        <h3>Exercice 1 : Dimensionnement d'un lien réseau (Modèle M/M/1)</h3>
+        <p><strong>Énoncé :</strong> Des paquets arrivent sur un lien de transmission selon un processus de Poisson avec un taux moyen de $\lambda = 800$ paquets/s. La longueur moyenne des paquets est de $L = 1000$ bits. Le temps de transmission est exponentiel.</p>
+        <p>On souhaite que le délai moyen total (attente + transmission) ne dépasse pas <strong>10 ms</strong>.</p>
+        <p><strong>Question :</strong> Quel doit être le débit minimum $C$ (en bits/s) du lien ?</p>
+
+        <button class="toggle-btn" onclick="toggleSolution('td1')">Voir la Solution Détaillée</button>
+        <div id="td1" class="solution">
+            <p><strong>Méthodologie :</strong> Nous devons trouver le taux de service $\mu$ nécessaire pour satisfaire la contrainte sur $W_s$, puis convertir $\mu$ en débit binaire.</p>
+            
+            <table>
+                <tr>
+                    <th>Étape</th>
+                    <th>Calcul</th>
+                    <th>Explication</th>
+                </tr>
+                <tr>
+                    <td>1. Identifier la contrainte</td>
+                    <td>$W_s \le 0.010$ s</td>
+                    <td>La contrainte est donnée en millisecondes.</td>
+                </tr>
+                <tr>
+                    <td>2. Utiliser la formule de $W_s$</td>
+                    <td>$W_s = \frac{1}{\mu - \lambda}$</td>
+                    <td>Formule du temps de séjour pour M/M/1.</td>
+                </tr>
+                <tr>
+                    <td>3. Isoler $\mu$</td>
+                    <td>$\frac{1}{\mu - 800} \le 0.01$<br>
+                    $\mu - 800 \ge \frac{1}{0.01}$<br>
+                    $\mu - 800 \ge 100$</td>
+                    <td>On résout l'inégalité pour trouver le taux de service minimum (paquets/s).</td>
+                </tr>
+                <tr>
+                    <td>4. Calculer $\mu_{min}$</td>
+                    <td>$\mu \ge 900$ paquets/s</td>
+                    <td>Le lien doit pouvoir traiter 900 paquets/s.</td>
+                </tr>
+                <tr>
+                    <td>5. Convertir en débit $C$</td>
+                    <td>$C = \mu \times L$<br>
+                    $C = 900 \times 1000 = 900,000$ bits/s</td>
+                    <td>Débit = (Paquets/s) × (Taille moyenne bits/paquet).</td>
+                </tr>
+            </table>
+            <p><strong>Réponse :</strong> Le débit minimum requis est de <strong>900 kbps</strong>.</p>
+        </div>
+    </div>
+
+    <div class="box">
+        <h3>Exercice 2 : Centre d'appels (Modèle M/M/3/3 - Erlang B)</h3>
+        <p><strong>Énoncé :</strong> Une petite entreprise dispose de 3 lignes téléphoniques ($N=3$). Les appels arrivent au rythme de 2 appels par minute ($\lambda = 2$). La durée moyenne d'un appel est de 1 minute ($1/\mu = 1$). Si toutes les lignes sont occupées, l'appel est perdu.</p>
+        <p><strong>Question :</strong> Quelle est la probabilité qu'un client soit rejeté ?</p>
+
+        <button class="toggle-btn" onclick="toggleSolution('td2')">Voir la Solution Détaillée</button>
+        <div id="td2" class="solution">
+            <p><strong>Analyse :</strong> C'est un système à perte M/M/N/N (ou M/M/3/3).</p>
+
+            <table>
+                <tr>
+                    <th>Variable</th>
+                    <th>Valeur</th>
+                    <th>Note</th>
+                </tr>
+                <tr>
+                    <td>Trafic offert ($A$)</td>
+                    <td>$A = \frac{\lambda}{\mu} = \frac{2}{1} = 2$ Erlangs</td>
+                    <td>Car $\mu = 1$ appel/min.</td>
+                </tr>
+                <tr>
+                    <td>Nombre de serveurs ($N$)</td>
+                    <td>3</td>
+                    <td></td>
+                </tr>
+            </table>
+
+            <p><strong>Calcul de la formule d'Erlang B :</strong></p>
+            $$ P_B = \frac{\frac{A^N}{N!}}{\sum_{k=0}^N \frac{A^k}{k!}} $$
+            
+            <p>Calculons le dénominateur (somme des termes) :</p>
+            <ul>
+                <li>$k=0 : \frac{2^0}{0!} = 1$</li>
+                <li>$k=1 : \frac{2^1}{1!} = 2$</li>
+                <li>$k=2 : \frac{2^2}{2!} = \frac{4}{2} = 2$</li>
+                <li>$k=3 : \frac{2^3}{3!} = \frac{8}{6} = 1.333$</li>
+                <li><strong>Somme :</strong> $1 + 2 + 2 + 1.333 = 6.333$</li>
+            </ul>
+
+            <p>Calculons le numérateur (terme pour $N=3$) :</p>
+            <ul>
+                <li>Numérateur = $1.333$</li>
+            </ul>
+
+            <p><strong>Résultat Final :</strong></p>
+            $$ P_{Blocage} = \frac{1.333}{6.333} \approx 0.21 $$
+            <p><strong>Interprétation :</strong> Il y a environ <strong>21%</strong> de chance qu'un appel soit rejeté.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- Script Logic -->
+<script type="module">
+    // Import Viz.js for DOT rendering
+    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+
+    // Function to Render DOT graphs
+    async function renderGraphs() {
+        const viz = await instance();
+        
+        // Render MM1
+        const dotMM1 = document.getElementById('dot-mm1').value;
+        const containerMM1 = document.getElementById('graph-mm1');
+        try {
+            const svg = viz.renderString(dotMM1, { engine: 'dot', format: 'svg' });
+            containerMM1.innerHTML = svg;
+        } catch (e) {
+            containerMM1.innerHTML = `<p style="color:red">Erreur de rendu : ${e.message}</p>`;
+        }
+
+        // Render Erlang
+        const dotErlang = document.getElementById('dot-erlang').value;
+        const containerErlang = document.getElementById('graph-erlang');
+        try {
+            const svg = viz.renderString(dotErlang, { engine: 'dot', format: 'svg' });
+            containerErlang.innerHTML = svg;
+        } catch (e) {
+            containerErlang.innerHTML = `<p style="color:red">Erreur de rendu : ${e.message}</p>`;
+        }
+    }
+
+    // Execute rendering
+    renderGraphs();
+</script>
+
+<script>
+    // Toggle function for solutions
+    function toggleSolution(id) {
+        var x = document.getElementById(id);
+        if (x.style.display === "block") {
+            x.style.display = "none";
+        } else {
+            x.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

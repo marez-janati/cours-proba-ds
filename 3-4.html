@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cours Interactif : Loi Exponentielle & Processus de Poisson</title>
+    
+    <!-- MathJax Configuration (Must be before loading MathJax) -->
+    <script>
+    window.MathJax = {
+      tex: {
+        inlineMath: [['$', '$'], ['\\(', '\\)']],
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
+      },
+      svg: {
+        fontCache: 'global'
+      }
+    };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --box-def-bg: #e8f4f8;
+            --box-def-border: #3498db;
+            --box-warn-bg: #fff3cd;
+            --box-warn-border: #ffc107;
+            --box-tip-bg: #d4edda;
+            --box-tip-border: #28a745;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: var(--text-color);
+            background-color: var(--bg-color);
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 { color: var(--primary-color); border-bottom: 3px solid var(--accent-color); padding-bottom: 10px; text-align: center; }
+        h2 { color: var(--primary-color); margin-top: 40px; border-left: 5px solid var(--accent-color); padding-left: 15px; }
+        h3 { color: #555; margin-top: 30px; }
+
+        /* Concept Boxes */
+        .box {
+            padding: 15px;
+            margin: 20px 0;
+            border-left: 5px solid;
+            border-radius: 4px;
+        }
+        .definition { background-color: var(--box-def-bg); border-color: var(--box-def-border); }
+        .definition strong { color: #2980b9; }
+        
+        .vigilance { background-color: var(--box-warn-bg); border-color: var(--box-warn-border); }
+        .vigilance strong { color: #856404; }
+
+        .tip { background-color: var(--box-tip-bg); border-color: var(--box-tip-border); }
+        .tip strong { color: #155724; }
+
+        /* Tables */
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; }
+        th, td { border: 1px solid #ddd; padding: 12px; text-align: left; }
+        th { background-color: var(--primary-color); color: white; }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+
+        /* Interactive Exercises */
+        .mini-exercise {
+            border: 2px dashed #ccc;
+            padding: 20px;
+            margin: 25px 0;
+            border-radius: 8px;
+            background-color: #fafafa;
+        }
+        .btn-reveal {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            cursor: pointer;
+            border-radius: 4px;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn-reveal:hover { background-color: #2980b9; }
+        .solution { display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid #ddd; animation: fadeIn 0.5s; }
+        
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+        /* Code/Diagrams */
+        pre { background: #2d2d2d; color: #f8f8f2; padding: 15px; border-radius: 5px; overflow-x: auto; }
+        .diagram-container { text-align: center; margin: 30px 0; overflow-x: auto;}
+        
+        /* Hidden source for graphs */
+        .graph-source { display: none; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Probabilités & Processus Stochastiques</h1>
+    <p><em>Guide interactif sur la Loi Exponentielle et le Processus de Poisson.</em></p>
+
+    <!-- =============================================================== -->
+    <!-- CHAPITRE 3 -->
+    <!-- =============================================================== -->
+    
+    <h2>Chapitre 3 : La Loi Exponentielle</h2>
+    <p>La loi exponentielle est la pierre angulaire de la fiabilité et des files d'attente. Elle modélise le temps d'attente avant l'apparition d'un phénomène (panne, arrivée d'un client).</p>
+
+    <div class="box definition">
+        📘 <strong>Définition :</strong> Une variable aléatoire $X$ suit une loi exponentielle de paramètre $\lambda > 0$, notée $X \sim Exp(\lambda)$, si sa densité est :
+        $$ f(t) = \lambda e^{-\lambda t} \quad \text{pour } t \ge 0 $$
+    </div>
+
+    <h3>3.1. Fonction de Répartition et Fiabilité</h3>
+    
+    <p>La fonction de répartition $F(t) = P(X \le t)$ s'obtient en intégrant la densité. Voici le détail pas à pas :</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Étape</th>
+                <th>Opération Mathématique</th>
+                <th>Explication</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>1. Poser l'intégrale</td>
+                <td>$F(x) = \int_{0}^{x} \lambda e^{-\lambda u} \,du$</td>
+                <td>Définition de la répartition.</td>
+            </tr>
+            <tr>
+                <td>2. Primitive</td>
+                <td>$= \left[ -e^{-\lambda u} \right]_0^x$</td>
+                <td>La primitive de $\lambda e^{-\lambda u}$ est $-e^{-\lambda u}$.</td>
+            </tr>
+            <tr>
+                <td>3. Calcul des bornes</td>
+                <td>$= (-e^{-\lambda x}) - (-e^{-\lambda \cdot 0})$</td>
+                <td>On évalue en $x$ et en $0$.</td>
+            </tr>
+            <tr>
+                <td>4. Résultat</td>
+                <td>$F(t) = 1 - e^{-\lambda t}$</td>
+                <td>Rappel : $e^0 = 1$.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <div class="box tip">
+        💡 <strong>Pro-Tip (Fiabilité) :</strong> En ingénierie, on utilise souvent la <strong>Fonction de Survie</strong> (ou Fiabilité) $R(t)$, qui est la probabilité que le composant fonctionne <em>encore</em> après le temps $t$.
+        $$ R(t) = P(X > t) = 1 - F(t) = e^{-\lambda t} $$
+    </div>
+
+    <!-- MINI EXERCISE 1 -->
+    <div class="mini-exercise">
+        <h4>✍️ Mini-Exercice 1 : Calcul Direct</h4>
+        <p>La durée de vie d'une ampoule suit une loi exponentielle avec une moyenne de 1000 heures ($E[X] = 1/\lambda = 1000$). Quelle est la probabilité qu'elle dure plus de 1000 heures ?</p>
+        <button class="btn-reveal" onclick="toggleSolution('sol1')">Voir la solution</button>
+        <div id="sol1" class="solution">
+            <p><strong>Solution :</strong></p>
+            <ol>
+                <li>On identifie $\lambda$ : Si $E[X] = 1000$, alors $\lambda = 1/1000 = 0.001$.</li>
+                <li>On cherche $P(X > 1000)$.</li>
+                <li>Formule de fiabilité : $P(X > t) = e^{-\lambda t}$.</li>
+                <li>Calcul : $P(X > 1000) = e^{-0.001 \times 1000} = e^{-1} \approx 0.367$.</li>
+            </ol>
+            <p><em>Interprétation : Il n'y a que 37% de chances qu'une variable exponentielle dépasse sa propre moyenne !</em></p>
+        </div>
+    </div>
+
+    <h3>3.2. Propriété d'Absence de Mémoire</h3>
+    
+    <div class="box vigilance">
+        ⚠️ <strong>Zone de Vigilance :</strong> C'est la propriété la plus contre-intuitive. Le fait qu'un composant ait fonctionné longtemps ne le "fatigue" pas s'il suit une loi exponentielle. Il est "comme neuf" à chaque instant.
+    </div>
+
+    <p><strong>Théorème :</strong> $P(X > t + s \mid X > t) = P(X > s)$</p>
+    <p>Cela signifie que la probabilité de survivre une durée supplémentaire $s$, sachant qu'on a déjà survécu $t$, est exactement la même que la probabilité de survivre $s$ depuis le début.</p>
+
+    <!-- MERMAID DIAGRAM FOR MEMORYLESS -->
+    <div class="diagram-container">
+        <strong>Visualisation de l'Absence de Mémoire</strong>
+        <div class="graph-source" type="mermaid">
+        graph LR
+            Start((Début)) -->|t écoulé| Now((Instant t))
+            Now -->|durée s ?| Future((t+s))
+            
+            style Start fill:#f9f,stroke:#333,stroke-width:2px
+            style Now fill:#bbf,stroke:#333,stroke-width:2px
+            style Future fill:#bfb,stroke:#333,stroke-width:2px
+            
+            Note[Probabilité conditionnelle <br/> d'atteindre t+s sachant qu'on est en t]
+            Note -.-> Now
+            
+            Equiv[Est ÉQUIVALENTE à <br/> partir de 0 et viser s]
+            Equiv -.-> Start
+        </div>
+        <div id="diag-mem"></div>
+    </div>
+
+    <!-- MINI EXERCISE 2 -->
+    <div class="mini-exercise">
+        <h4>✍️ Mini-Exercice 2 : Le Paradoxe</h4>
+        <p>Vous attendez un bus depuis 20 minutes. Le temps d'arrivée suit une loi Exponentielle de moyenne 10 minutes. Quelle est votre espérance d'attente <em>supplémentaire</em> ?</p>
+        <button class="btn-reveal" onclick="toggleSolution('sol2')">Voir la solution</button>
+        <div id="sol2" class="solution">
+            <p><strong>Réponse : 10 minutes.</strong></p>
+            <p>À cause de l'absence de mémoire, le temps écoulé (20 min) n'influence pas le futur. Le processus "oublie" que vous avez attendu. L'espérance reste $E[X] = 10$ min, peu importe le passé.</p>
+        </div>
+    </div>
+
+    <h3>3.3. Le Théorème du Minimum (Compétition)</h3>
+    <p>Si deux variables indépendantes $X \sim Exp(\lambda)$ et $Y \sim Exp(\mu)$ sont en "compétition", la variable $Z = \min(X, Y)$ correspond à la <strong>première défaillance</strong>.</p>
+    
+    <p>$$ Z \sim Exp(\lambda + \mu) $$</p>
+    
+    <p>Cela signifie que le système global échoue plus vite que chaque composant individuel. Les taux de défaillance s'additionnent.</p>
+
+    <!-- =============================================================== -->
+    <!-- CHAPITRE 4 -->
+    <!-- =============================================================== -->
+
+    <h2>Chapitre 4 : Le Processus de Poisson</h2>
+
+    <h3>4.1. La Loi de Poisson</h3>
+    <div class="box definition">
+        📘 <strong>Définition :</strong> Une variable discrète $N$ suit une loi de Poisson $P(\lambda)$ si :
+        $$ P(N = k) = e^{-\lambda} \frac{\lambda^k}{k!} $$
+        L'espérance et la variance sont identiques : $E[N] = Var(N) = \lambda$.
+    </div>
+
+    <!-- MINI EXERCISE 3 -->
+    <div class="mini-exercise">
+        <h4>✍️ Mini-Exercice 3 : Vérification</h4>
+        <p>Un serveur reçoit en moyenne $\lambda = 3$ requêtes par seconde. Quelle est la probabilité de recevoir exactement 0 requête dans la prochaine seconde ?</p>
+        <button class="btn-reveal" onclick="toggleSolution('sol3')">Voir la solution</button>
+        <div id="sol3" class="solution">
+            <p>On applique la formule avec $k=0$ et $\lambda=3$ :</p>
+            $$ P(N=0) = e^{-3} \frac{3^0}{0!} = e^{-3} \times \frac{1}{1} \approx 0.0498 $$
+            <p>Il y a environ 5% de chances qu'il n'y ait aucune requête.</p>
+        </div>
+    </div>
+
+    <h3>4.2. Le Processus de Comptage</h3>
+    <p>Le Processus de Poisson $\{N(t), t \ge 0\}$ compte le nombre d'événements survenus. Les intervalles entre les événements suivent une loi Exponentielle.</p>
+
+    <div class="diagram-container">
+        <strong>Visualisation : Sauts et Intervalles</strong>
+        <!-- Provided Mermaid code, fixed for syntax -->
+        <div class="graph-source" type="mermaid">
+        graph LR
+            %% Noeuds temporels
+            T0(("T0=0")) 
+            T1(("T1")) 
+            T2(("T2")) 
+            T3(("T3"))
+            
+            %% Compteur N
+            N0["N=0"] 
+            N1["N=1"] 
+            N2["N=2"] 
+            N3["N=3"]
+
+            %% Temps inter-arrivees
+            T0 -- "Exp(lambda)" --> T1
+            T1 -- "Exp(lambda)" --> T2
+            T2 -- "Exp(lambda)" --> T3
+
+            %% Evolution N
+            T0 -.-> N0
+            T1 -.-> N1
+            T2 -.-> N2
+            T3 -.-> N3
+
+            %% Transitions
+            N0 ==>|"Evt 1"| N1
+            N1 ==>|"Evt 2"| N2
+            N2 ==>|"Evt 3"| N3
+
+            style N0 fill:#e1f5fe,stroke:#01579b
+            style N1 fill:#b3e5fc,stroke:#01579b
+            style N2 fill:#81d4fa,stroke:#01579b
+            style N3 fill:#4fc3f7,stroke:#01579b
+        </div>
+        <div id="diag-poisson"></div>
+    </div>
+
+    <h3>4.3. Superposition de Processus</h3>
+    <p>La somme de deux processus de Poisson indépendants de taux $\lambda$ et $\mu$ est un processus de Poisson de taux $\lambda + \mu$.</p>
+    
+    <div class="box vigilance">
+        ⚠️ <strong>Attention :</strong> Ceci n'est vrai que pour la loi de Poisson ! La somme de deux variables uniformes, par exemple, ne suit pas une loi uniforme. La stabilité par addition est une propriété rare.
+    </div>
+
+    <!-- =============================================================== -->
+    <!-- SECTION CORRIGÉS TD -->
+    <!-- =============================================================== -->
+
+    <h2>📂 Corrigés des Travaux Dirigés (Détaillés)</h2>
+    <p>Voici la correction détaillée des exercices d'application correspondant aux chapitres ci-dessus.</p>
+
+    <div class="box">
+        <h3>Exercice A : Fiabilité d'un système électronique</h3>
+        <p><strong>Énoncé :</strong> Un composant électronique a un taux de défaillance constant $\lambda = 0.002$ par heure.
+        <br>1. Quelle est la probabilité qu'il survive plus de 100 heures ?
+        <br>2. Quelle est la probabilité qu'il tombe en panne entre 100h et 200h ?</p>
+        
+        <button class="btn-reveal" onclick="toggleSolution('td1')">Afficher la Correction Détaillée</button>
+        
+        <div id="td1" class="solution">
+            <h4>1. Probabilité de survie > 100h</h4>
+            <p>On utilise la fonction de fiabilité $R(t) = e^{-\lambda t}$.</p>
+            <table>
+                <tr>
+                    <td>Données</td>
+                    <td>$\lambda = 0.002$, $t = 100$</td>
+                </tr>
+                <tr>
+                    <td>Calcul</td>
+                    <td>$P(X > 100) = e^{-(0.002 \times 100)} = e^{-0.2}$</td>
+                </tr>
+                <tr>
+                    <td>Résultat</td>
+                    <td>$\approx 0.8187$ (soit 81.87%)</td>
+                </tr>
+            </table>
+
+            <h4>2. Panne entre 100h et 200h</h4>
+            <p>On cherche $P(100 < X \le 200)$. Cela correspond à $F(200) - F(100)$ ou encore $R(100) - R(200)$.</p>
+            $$ \begin{aligned} 
+            P(100 < X \le 200) &= (1 - e^{-0.002 \times 200}) - (1 - e^{-0.002 \times 100}) \\
+            &= e^{-0.2} - e^{-0.4} \\
+            &= 0.8187 - 0.6703 \\
+            &= 0.1484 
+            \end{aligned} $$
+            <p><strong>Réponse :</strong> Il y a 14.84% de chances que la panne survienne dans cet intervalle.</p>
+        </div>
+    </div>
+
+    <div class="box">
+        <h3>Exercice B : Superposition de Flux (Poisson)</h3>
+        <p><strong>Énoncé :</strong> Des camions arrivent à un entrepôt selon un processus de Poisson de taux $\lambda_C = 4$/heure. Des voitures arrivent selon un processus indépendant de taux $\lambda_V = 10$/heure.
+        <br>Quel est le nombre moyen de véhicules total en 30 minutes et la probabilité d'avoir exactement 0 véhicule en 5 minutes ?</p>
+
+        <button class="btn-reveal" onclick="toggleSolution('td2')">Afficher la Correction Détaillée</button>
+
+        <div id="td2" class="solution">
+            <h4>Analyse</h4>
+            <p>D'après le théorème de superposition, le processus total $N_{tot}$ est un Poisson de paramètre $\Lambda = \lambda_C + \lambda_V$.</p>
+            $$ \Lambda = 4 + 10 = 14 \text{ véhicules/heure} $$
+
+            <h4>1. Nombre moyen en 30 minutes</h4>
+            <p>L'espérance sur une durée $t$ est $E[N(t)] = \Lambda \times t$.</p>
+            <ul>
+                <li>$t = 0.5$ heure (30 min)</li>
+                <li>$E = 14 \times 0.5 = 7$ véhicules.</li>
+            </ul>
+
+            <h4>2. Probabilité de 0 véhicule en 5 minutes</h4>
+            <p>On doit d'abord ajuster le taux pour 5 minutes (soit $1/12$ d'heure).</p>
+            $$ \lambda_{5min} = 14 \times \frac{5}{60} = \frac{14}{12} \approx 1.167 $$
+            <p>Calcul de $P(X=0)$ :</p>
+            $$ P(X=0) = e^{-1.167} \frac{1.167^0}{0!} = e^{-1.167} \approx 0.311 $$
+            <p><strong>Réponse :</strong> Il y a environ 31.1% de chances qu'aucun véhicule ne passe en 5 minutes.</p>
+        </div>
+    </div>
+
+</div>
+
+<!-- JAVASCRIPT LOGIC -->
+<script type="module">
+    // Import Libraries
+    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+    import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+    // Initialize Mermaid
+    mermaid.initialize({ startOnLoad: false, theme: 'default' });
+
+    // Function to render Dot
+    async function renderDot(code) {
+        try {
+            const viz = await instance();
+            return viz.renderString(code, { engine: 'dot', format: 'svg' });
+        } catch (err) {
+            return `<p style="color:red">Dot Error: ${err.message}</p>`;
+        }
+    }
+
+    // Function to render Mermaid
+    async function renderMermaid(code, containerId) {
+        try {
+            // Clean code for HTML entities just in case
+            const cleanCode = code.replace(/&gt;/g, '>').replace(/&lt;/g, '<');
+            const id = 'graph-' + Math.random().toString(36).substr(2, 9);
+            const { svg } = await mermaid.render(id, cleanCode);
+            return svg;
+        } catch (err) {
+            console.error(err);
+            return `<p style="color:red">Mermaid Error: ${err.message}</p>`;
+        }
+    }
+
+    // Main Logic to find and render all diagrams
+    async function renderAllDiagrams() {
+        const sources = document.querySelectorAll('.graph-source');
+        
+        for (let src of sources) {
+            const type = src.getAttribute('type');
+            const code = src.textContent.trim();
+            // The container is the next sibling or parent's target
+            const outputDiv = src.nextElementSibling; 
+
+            if (outputDiv) {
+                outputDiv.innerHTML = "Loading Diagram...";
+                if (type === 'mermaid') {
+                    const svg = await renderMermaid(code);
+                    outputDiv.innerHTML = svg;
+                } else if (type === 'dot') {
+                    const svg = await renderDot(code);
+                    outputDiv.innerHTML = svg;
+                }
+            }
+        }
+    }
+
+    // Run rendering
+    renderAllDiagrams();
+</script>
+
+<script>
+    // Toggle Solution Logic
+    function toggleSolution(id) {
+        const x = document.getElementById(id);
+        if (x.style.display === "block") {
+            x.style.display = "none";
+        } else {
+            x.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>

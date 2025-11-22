@@ -1,0 +1,436 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 9 : Processus de Naissance et de Mort</title>
+    
+    <!-- MathJax Configuration for LaTeX Rendering -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --warning-color: #f39c12;
+            --danger-color: #e74c3c;
+            --success-color: #27ae60;
+            --light-bg: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+        }
+
+        h1, h2, h3 {
+            color: var(--primary-color);
+            border-bottom: 2px solid var(--accent-color);
+            padding-bottom: 10px;
+        }
+
+        h1 { text-align: center; margin-bottom: 40px; }
+
+        /* Pedagogical Boxes */
+        .box {
+            border-left: 5px solid;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        .definition {
+            border-color: var(--accent-color);
+            background-color: #e8f6f3;
+        }
+
+        .definition h4 { color: var(--accent-color); margin-top: 0; }
+
+        .vigilance {
+            border-color: var(--danger-color);
+            background-color: #fdedec;
+        }
+
+        .vigilance h4 { color: var(--danger-color); margin-top: 0; }
+
+        .pro-tip {
+            border-color: var(--success-color);
+            background-color: #e9f7ef;
+        }
+
+        .pro-tip h4 { color: var(--success-color); margin-top: 0; }
+
+        /* Graph Container */
+        .graph-container {
+            text-align: center;
+            background: white;
+            padding: 20px;
+            border: 1px dashed #bdc3c7;
+            border-radius: 8px;
+            margin: 20px 0;
+            overflow-x: auto;
+            min-height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Interactive Exercise Styling */
+        .exercise-container {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+
+        .btn-solution {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+
+        .btn-solution:hover {
+            background-color: var(--accent-color);
+        }
+
+        .solution-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: var(--light-bg);
+            border-left: 4px solid var(--success-color);
+        }
+
+        /* Table Styling */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+            background: white;
+        }
+
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: var(--primary-color);
+            color: white;
+        }
+
+        tr:nth-child(even) { background-color: #f2f2f2; }
+
+        code {
+            background-color: #eee;
+            padding: 2px 4px;
+            border-radius: 3px;
+            font-family: monospace;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Chapitre 9 : Processus de Naissance et de Mort (PNM)</h1>
+
+    <p class="intro">
+        Le <strong>Processus de Naissance et de Mort</strong> (<em>Birth and Death Process</em>) est le modèle fondamental pour l'étude des files d'attente. Il s'agit d'une Chaîne de Markov à Temps Continu (CTMC) où les transitions ne se font qu'entre voisins immédiats.
+    </p>
+
+    <!-- PART 1: FORMALISME -->
+    <section>
+        <h2>1. Formalisme et Définitions</h2>
+
+        <div class="box definition">
+            <h4>📘 Définition</h4>
+            <p>Un PNM est défini sur un espace d'états $S = \{0, 1, 2, \dots\}$ où l'état du système $N(t)$ ne peut changer que par $\pm 1$.</p>
+            <ul>
+                <li><strong>$\lambda_i$ (Taux de naissance)</strong> : Probabilité par unité de temps de passer de $i \to i+1$.</li>
+                <li><strong>$\mu_i$ (Taux de mort)</strong> : Probabilité par unité de temps de passer de $i \to i-1$.</li>
+            </ul>
+        </div>
+
+        <div class="box vigilance">
+            <h4>⚠️ Zone de Vigilance</h4>
+            <p><strong>Condition aux limites :</strong> Le système ne peut pas avoir une population négative. Par conséquent, le taux de mort à l'état 0 est toujours nul :</p>
+            $$ \mu_0 = 0 $$
+        </div>
+
+        <h3>Représentation Graphique Interactive</h3>
+        <p>Voici la structure générale d'un PNM. Notez que les transitions se font uniquement de proche en proche.</p>
+        
+        <!-- Container for Graph 1 -->
+        <div id="graph-general" class="graph-container">Chargement du diagramme...</div>
+
+        <div class="exercise-container">
+            <h4>🧠 Mini-Exercice 1 : Compréhension du Graphe</h4>
+            <p>Si dans un système, le taux de naissance $\lambda_k$ devient nul pour tout $k \ge 3$, que cela signifie-t-il physiquement pour le système ?</p>
+            
+            <button class="btn-solution" onclick="toggleSolution('sol-1')">Voir la réponse</button>
+            
+            <div id="sol-1" class="solution-content">
+                <strong>Réponse :</strong>
+                Cela signifie que la capacité du système est <strong>limitée à 3 individus</strong> (ou clients). Une fois l'état 3 atteint, aucune nouvelle naissance (arrivée) n'est possible. Le système ne visitera jamais les états 4, 5, etc.
+            </div>
+        </div>
+    </section>
+
+    <!-- PART 2: SOLUTION ANALYTIQUE -->
+    <section>
+        <h2>2. Solution Analytique : Régime Stationnaire</h2>
+        
+        <p>Nous cherchons la probabilité $\pi_k$ que le système soit dans l'état $k$ à long terme.</p>
+
+        <h3>Équations de Balance (Coupes Locales)</h3>
+        <div class="box pro-tip">
+            <h4>💡 Pro-Tip : La méthode de la Coupe</h4>
+            <p>Au lieu d'écrire les équations de flux global pour chaque nœud (Entrée = Sortie), il est beaucoup plus rapide d'utiliser la propriété de <strong>réversibilité locale</strong> entre deux états voisins :</p>
+            <p style="text-align: center; font-weight: bold;">Flux $i \to i+1$ = Flux $i+1 \to i$</p>
+            $$ \lambda_i \pi_i = \mu_{i+1} \pi_{i+1} $$
+        </div>
+
+        <p>En appliquant cette récurrence, on obtient la formule générale du produit :</p>
+        $$ \pi_k = \pi_0 \prod_{i=0}^{k-1} \frac{\lambda_i}{\mu_{i+1}} $$
+
+        <p>Et $\pi_0$ est obtenu par normalisation ($\sum \pi_k = 1$) :</p>
+        $$ \pi_0 = \frac{1}{1 + \sum_{k=1}^{+\infty} \prod_{i=0}^{k-1} \frac{\lambda_i}{\mu_{i+1}}} $$
+
+        <div class="exercise-container">
+            <h4>🧠 Mini-Exercice 2 : Calcul Rapide</h4>
+            <p>Soit un système simple à 2 états (0 et 1). <br>
+            $\lambda_0 = 2$ (naissances/min), $\mu_1 = 4$ (morts/min).<br>
+            Calculez $\pi_1$ en fonction de $\pi_0$, puis trouvez la valeur numérique de $\pi_0$.</p>
+            
+            <button class="btn-solution" onclick="toggleSolution('sol-2')">Voir la solution</button>
+            
+            <div id="sol-2" class="solution-content">
+                <strong>Solution étape par étape :</strong>
+                <ol>
+                    <li>Équation de coupe : $\lambda_0 \pi_0 = \mu_1 \pi_1$</li>
+                    <li>Application numérique : $2 \pi_0 = 4 \pi_1 \implies \pi_1 = 0.5 \pi_0$</li>
+                    <li>Normalisation : $\pi_0 + \pi_1 = 1$</li>
+                    <li>Substitution : $\pi_0 + 0.5 \pi_0 = 1 \implies 1.5 \pi_0 = 1$</li>
+                    <li>Résultat : $\pi_0 = 2/3$ (et donc $\pi_1 = 1/3$)</li>
+                </ol>
+            </div>
+        </div>
+    </section>
+
+    <!-- PART 3: CORRIGÉS ET APPLICATION -->
+    <section>
+        <h2>3. Corrigés des Travaux Dirigés : Cas à Taux Variables</h2>
+        
+        <p>Analysons un cas complexe souvent posé en examen. Les taux dépendent de l'état $k$ du système :</p>
+        <ul>
+            <li>Taux de naissance : <strong>$\lambda_k = (k+2)\lambda$</strong></li>
+            <li>Taux de mort : <strong>$\mu_k = k\mu$</strong></li>
+        </ul>
+
+        <h3>Visualisation du Système Spécifique</h3>
+        <!-- Container for Graph 2 -->
+        <div id="graph-td" class="graph-container">Chargement du diagramme TD...</div>
+
+        <h3>Résolution Détaillée</h3>
+        
+        <p>Nous allons déterminer $\pi_k$ et le nombre moyen de clients $N_s$.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Étape</th>
+                    <th>Action Mathématique</th>
+                    <th>Résultat Intermédiaire</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>1. Relation de base</strong></td>
+                    <td>Appliquer l'équation de coupe locale $\lambda_{k-1}\pi_{k-1} = \mu_k \pi_k$.</td>
+                    <td>$$ \pi_k = \frac{\lambda_{k-1}}{\mu_k} \pi_{k-1} $$</td>
+                </tr>
+                <tr>
+                    <td><strong>2. Substitution</strong></td>
+                    <td>Remplacer $\lambda$ et $\mu$ par leurs fonctions de $k$. <br> $\lambda_{k-1} = (k-1+2)\lambda = (k+1)\lambda$.</td>
+                    <td>$$ \pi_k = \frac{(k+1)\lambda}{k\mu} \pi_{k-1} $$</td>
+                </tr>
+                <tr>
+                    <td><strong>3. Récurrence</strong></td>
+                    <td>Calculer les premiers termes pour trouver le motif ("Pattern").</td>
+                    <td>
+                        $k=1 \to \pi_1 = \frac{2\lambda}{1\mu}\pi_0 = 2\rho\pi_0$<br>
+                        $k=2 \to \pi_2 = \frac{3\lambda}{2\mu}\pi_1 = \frac{3}{2}\rho (2\rho\pi_0) = 3\rho^2\pi_0$
+                    </td>
+                </tr>
+                <tr>
+                    <td><strong>4. Formule Générale</strong></td>
+                    <td>Généralisation par récurrence (Démontrée dans le cours).</td>
+                    <td>$$ \pi_k = (k+1) \left(\frac{\lambda}{\mu}\right)^k \pi_0 $$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <div class="box vigilance">
+            <h4>⚠️ Point Mathématique Critique : Calcul de $\pi_0$</h4>
+            <p>Pour trouver $\pi_0$, nous devons calculer la somme : $S = \sum_{k=0}^{\infty} (k+1)\rho^k$.</p>
+            <p>C'est une <strong>dérivée de série géométrique</strong>. Voici l'astuce :</p>
+            $$ \sum_{k=0}^{\infty} \rho^{k+1} = \frac{\rho}{1-\rho} \quad \xrightarrow{\text{Dérivée par rapport à } \rho} \quad \sum_{k=0}^{\infty} (k+1)\rho^k = \frac{1}{(1-\rho)^2} $$
+            <p>Donc :</p>
+            $$ \pi_0 = \frac{1}{S} = (1-\rho)^2 $$
+        </div>
+
+        <h3>Résultat Final</h3>
+        <p>La distribution stationnaire est donnée par :</p>
+        $$ \pi_k = (1-\rho)^2 (k+1) \rho^k \quad \text{avec } \rho = \frac{\lambda}{\mu} $$
+
+        <div class="exercise-container">
+            <h4>🧠 Mini-Exercice 3 : Espérance ($N_s$)</h4>
+            <p>D'après le cours, le nombre moyen de clients est $N_s = \frac{2\rho}{1-\rho}$. <br>
+            Si le taux d'arrivée $\lambda$ est de 1 client/h et le taux de service $\mu$ est de 2 clients/h, combien de clients y a-t-il en moyenne dans le système ?</p>
+            
+            <button class="btn-solution" onclick="toggleSolution('sol-3')">Vérifier le résultat</button>
+            
+            <div id="sol-3" class="solution-content">
+                <strong>Calcul :</strong><br>
+                1. Calcul de $\rho = \lambda / \mu = 1 / 2 = 0.5$.<br>
+                2. $N_s = \frac{2 \times 0.5}{1 - 0.5}$<br>
+                3. $N_s = \frac{1}{0.5} = 2$<br>
+                <br>
+                <strong>Interprétation :</strong> Il y a en moyenne <strong>2 clients</strong> dans le système.
+            </div>
+        </div>
+
+    </section>
+
+    <!-- JAVASCRIPT LOGIC FOR GRAPHS -->
+    <script type="module">
+        // Import Graphviz rendering library
+        import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+
+        // 1. DOT Code for General PNM (Section 9.1)
+        const dotGeneral = `digraph PNM {
+            rankdir=LR;
+            node [shape=circle, style=filled, fillcolor="#e8f8f5", fontname="Helvetica", fontsize=12, color="#2c3e50"];
+            edge [fontname="Helvetica", fontsize=10, color="#7f8c8d"];
+            
+            0 [label="0"];
+            1 [label="1"];
+            2 [label="2"];
+            i [label="i", fillcolor="#f9e79f"];
+            i_plus [label="i+1", fillcolor="#f9e79f"];
+            
+            d1 [label="...", shape=plaintext, style=""];
+            d2 [label="...", shape=plaintext, style=""];
+
+            0 -> 1 [label="λ₀"];
+            1 -> 0 [label="μ₁"];
+            1 -> 2 [label="λ₁"];
+            2 -> 1 [label="μ₂"];
+            2 -> d1 [label="λ₂"];
+            d1 -> 2 [label="μ₃"];
+            d1 -> i [label="λᵢ₋₁"];
+            i -> d1 [label="μᵢ"];
+            i -> i_plus [label="λᵢ"];
+            i_plus -> i [label="μᵢ₊₁"];
+            i_plus -> d2 [label="λᵢ₊₁"];
+            d2 -> i_plus [label="μᵢ₊₂"];
+        }`;
+
+        // 2. DOT Code for Exercise (Section 9.3)
+        const dotExercise = `digraph TD2_Ex4 {
+            rankdir=LR;
+            bgcolor="transparent";
+            node [shape=circle, style=filled, fillcolor="white", fontname="Helvetica", color="#2c3e50"];
+            edge [fontname="Courier", fontsize=10];
+            
+            0 [label="0"];
+            1 [label="1"];
+            d1 [label="...", shape=plaintext];
+            km1 [label="k-1"];
+            k [label="k", fillcolor="#d2b4de"];
+            kp1 [label="k+1"];
+            d2 [label="...", shape=plaintext];
+
+            // State 0-1
+            0 -> 1 [label="2λ", color="blue"];
+            1 -> 0 [label="μ", color="red"];
+
+            // State 1-...
+            1 -> d1 [label="3λ", color="blue"];
+            d1 -> 1 [label="2μ", color="red"];
+
+            // Around k
+            d1 -> km1 [label="(k)λ", color="blue"];
+            km1 -> d1 [label="(k-1)μ", color="red"];
+            
+            km1 -> k [label="(k+1)λ", color="blue"];
+            k -> km1 [label="kμ", color="red"];
+
+            k -> kp1 [label="(k+2)λ", color="blue"];
+            kp1 -> k [label="(k+1)μ", color="red"];
+
+            kp1 -> d2 [label="..."];
+        }`;
+
+        // Function to Render Graphs
+        async function renderGraphs() {
+            try {
+                const viz = await instance();
+                
+                // Render General Graph
+                const svgGeneral = viz.renderString(dotGeneral, { engine: 'dot', format: 'svg' });
+                document.getElementById('graph-general').innerHTML = svgGeneral;
+
+                // Render Exercise Graph
+                const svgExercise = viz.renderString(dotExercise, { engine: 'dot', format: 'svg' });
+                document.getElementById('graph-td').innerHTML = svgExercise;
+
+            } catch (err) {
+                console.error(err);
+                document.getElementById('graph-general').innerHTML = `<p style="color:red">Erreur de rendu graphique: ${err.message}</p>`;
+            }
+        }
+
+        // Execute rendering on load
+        renderGraphs();
+    </script>
+
+    <!-- Simple JS for Toggling Solutions -->
+    <script>
+        function toggleSolution(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        }
+    </script>
+
+</body>
+</html>

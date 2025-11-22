@@ -1,0 +1,372 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Guide Interactif : Processus Stochastiques</title>
+    
+    <!-- 1. Configuration MathJax (Doit être avant le chargement du script) -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']]
+            },
+            svg: { fontCache: 'global' }
+        };
+    </script>
+    <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js" async></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-color: #f39c12;
+            --danger-color: #c0392b;
+            --light-bg: #f8f9fa;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f4f4f4;
+        }
+
+        h1, h2, h3 { color: var(--primary-color); border-bottom: 2px solid #e0e0e0; padding-bottom: 10px; }
+        h1 { text-align: center; margin-bottom: 40px; color: var(--accent-color); border: none; }
+
+        /* --- Boîtes Pédagogiques --- */
+        .box {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+        
+        .definition {
+            background-color: #e8f4f8;
+            border-left: 5px solid var(--accent-color);
+        }
+        .definition h4 { margin-top: 0; color: var(--accent-color); }
+
+        .vigilance {
+            background-color: #fff3e0;
+            border-left: 5px solid var(--warning-color);
+        }
+        .vigilance h4 { margin-top: 0; color: var(--warning-color); }
+
+        .pro-tip {
+            background-color: #e8f5e9;
+            border-left: 5px solid var(--success-color);
+        }
+        .pro-tip h4 { margin-top: 0; color: var(--success-color); }
+
+        /* --- Zone Graphique --- */
+        .graph-container {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            margin: 20px 0;
+            text-align: center;
+            overflow-x: auto;
+        }
+
+        /* --- Mini Exercices Interactifs --- */
+        .mini-exo {
+            background: white;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+        .btn-solution {
+            background-color: var(--accent-color);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background 0.3s;
+        }
+        .btn-solution:hover { background-color: #2980b9; }
+        .solution-content {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: #f1f1f1;
+            border-radius: 5px;
+            border-left: 3px solid var(--success-color);
+        }
+
+        /* --- Tables --- */
+        table { width: 100%; border-collapse: collapse; margin: 20px 0; background: white; }
+        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: var(--primary-color); color: white; }
+        tr:nth-child(even) { background-color: #f9f9f9; }
+
+        code { background: #eee; padding: 2px 5px; border-radius: 3px; font-family: monospace; }
+    </style>
+</head>
+<body>
+
+    <h1>📘 Introduction aux Processus Stochastiques</h1>
+
+    <!-- CHAPITRE 1 -->
+    <section>
+        <h2>1. Définition et Concepts Fondamentaux</h2>
+        
+        <div class="box definition">
+            <h4>📘 Définition : Processus Stochastique</h4>
+            <p>Un processus stochastique est une famille de variables aléatoires $\{X_t\}_{t \in T}$ définies sur un espace de probabilité $(\Omega, \mathcal{F}, P)$ à valeurs dans un espace d'états $E$.</p>
+        </div>
+
+        <div class="box vigilance">
+            <h4>⚠️ Zone de Vigilance : La Dualité</h4>
+            <p>Ne confondez pas les deux visions :</p>
+            <ul>
+                <li><strong>Fixer $t$ :</strong> $X_t$ est une <em>variable aléatoire</em> (une coupe verticale à un instant donné).</li>
+                <li><strong>Fixer $\omega$ (le hasard) :</strong> $t \mapsto X_t(\omega)$ est une <em>trajectoire</em> (une fonction du temps, déterministe une fois l'expérience réalisée).</li>
+            </ul>
+        </div>
+
+        <h3>1.1 Classification Espace-Temps</h3>
+        <p>La nature du processus dépend de l'ensemble des temps $T$ et de l'espace d'états $E$.</p>
+
+        <div class="graph-container">
+            <h4>Visualisation : Trajectoire Temps Discret / Espace Discret</h4>
+            <div id="viz-discrete">Chargement du graphique...</div>
+            <p><em>Figure 1 : Évolution d'une population (Espace Discret) relevée à des instants fixes (Temps Discret).</em></p>
+        </div>
+
+        <!-- MINI EXERCICE 1 -->
+        <div class="mini-exo">
+            <h3>🧠 Mini-Exercice 1 : Classification</h3>
+            <p><strong>Scénario :</strong> Vous observez la température exacte d'une salle de serveur ($E = \mathbb{R}$) mais l'enregistrement ne se fait que toutes les heures pile ($t = 0h, 1h, 2h...$).</p>
+            <p>Quelle est la classification de ce processus ?</p>
+            <button class="btn-solution" onclick="toggleSolution('sol1')">Voir la solution</button>
+            <div id="sol1" class="solution-content">
+                <strong>Réponse :</strong> Temps Discret / Espace Continu.
+                <ul>
+                    <li><strong>Temps Discret :</strong> Car on mesure à des instants dénombrables ($T = \mathbb{N}$).</li>
+                    <li><strong>Espace Continu :</strong> Car la température est un nombre réel ($E = \mathbb{R}$).</li>
+                </ul>
+            </div>
+        </div>
+
+        <h3>1.2 Exemple Introductif : Le Jeu des Billets</h3>
+        <p>Soit une urne avec 20 billets. Mise = 5d. $X$ est le gain net.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Type de Billet</th>
+                    <th>Quantité</th>
+                    <th>Valeur Faciale</th>
+                    <th>Gain Net ($X$)</th>
+                    <th>Probabilité $P(X=x)$</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Perdant</td>
+                    <td>12</td>
+                    <td>0d</td>
+                    <td>-5d</td>
+                    <td>$12/20 = 0.6$</td>
+                </tr>
+                <tr>
+                    <td>Gagnant Moyen</td>
+                    <td>4</td>
+                    <td>10d</td>
+                    <td>+5d</td>
+                    <td>$4/20 = 0.2$</td>
+                </tr>
+                <tr>
+                    <td>Gros Lot</td>
+                    <td>4</td>
+                    <td>20d</td>
+                    <td>+15d</td>
+                    <td>$4/20 = 0.2$</td>
+                </tr>
+            </tbody>
+        </table>
+        <p><strong>Espérance :</strong> $E(X) = (-5 \times 0.6) + (5 \times 0.2) + (15 \times 0.2) = 1$ dinar.</p>
+    </section>
+
+    <!-- CHAPITRE 2 -->
+    <section>
+        <h2>2. Variables Aléatoires et Fiabilité</h2>
+
+        <div class="box pro-tip">
+            <h4>💡 Pro-Tip : Densité vs Répartition</h4>
+            <p>Pour passer de la densité $f(x)$ à la répartition $F(x)$, on <strong>intègre</strong>. <br>
+            Pour passer de la répartition $F(x)$ à la densité $f(x)$, on <strong>dérive</strong>.</p>
+        </div>
+
+        <h3>2.1 Application à la Fiabilité</h3>
+        <p>La fiabilité $R(t)$ est la probabilité qu'un système fonctionne encore après l'instant $t$.</p>
+        <p>$$ R(t) = P(T > t) = 1 - F(t) $$</p>
+
+        <div class="graph-container">
+            <h4>Courbe de Décroissance de la Fiabilité</h4>
+            <!-- Mermaid Code -->
+            <pre class="mermaid">
+            xychart-beta
+                title "Courbe de Fiabilité R_t"
+                x-axis "Temps t" [0, 1, 2, 3, 4, 5]
+                y-axis "Fiabilité R_t" 0 --> 1
+                line [1.0, 0.61, 0.37, 0.22, 0.14, 0.08]
+            </pre>
+        </div>
+
+        <!-- MINI EXERCICE 2 -->
+        <div class="mini-exo">
+            <h3>🧠 Mini-Exercice 2 : Calcul rapide</h3>
+            <p>Si la fonction de répartition est $F(t) = 1 - e^{-2t}$ pour $t \ge 0$. Quelle est la fiabilité $R(3)$ ?</p>
+            <button class="btn-solution" onclick="toggleSolution('sol2')">Voir la solution</button>
+            <div id="sol2" class="solution-content">
+                <strong>Réponse :</strong> $R(t) = 1 - F(t) = e^{-2t}$.<br>
+                Donc $R(3) = e^{-2 \times 3} = e^{-6} \approx 0.0025$.
+            </div>
+        </div>
+    </section>
+
+    <!-- SECTION CORRIGÉS DÉTAILLÉS -->
+    <section>
+        <h2>📝 Corrigés des Travaux Dirigés (Détaillés)</h2>
+        <p>Voici les solutions complètes, étape par étape, des exercices du cours.</p>
+
+        <div class="box">
+            <h3>Exercice 1 : Fonction Puissance</h3>
+            <p><strong>Énoncé :</strong> Vérifier que $f(x) = \frac{3}{x^4}$ est une densité sur $[1, +\infty[$.</p>
+            
+            <table>
+                <tr>
+                    <th>Étape</th>
+                    <th>Calcul Mathématique</th>
+                    <th>Explication</th>
+                </tr>
+                <tr>
+                    <td>1. Poser l'intégrale</td>
+                    <td>$I = \int_{1}^{+\infty} 3 x^{-4} dx$</td>
+                    <td>On intègre sur tout le domaine de définition.</td>
+                </tr>
+                <tr>
+                    <td>2. Primitive</td>
+                    <td>Primitive de $x^n$ est $\frac{x^{n+1}}{n+1}$.<br>Ici $n=-4$, donc $\frac{x^{-3}}{-3}$.</td>
+                    <td>Attention au signe négatif.</td>
+                </tr>
+                <tr>
+                    <td>3. Calcul</td>
+                    <td>$I = 3 \left[ \frac{-1}{3x^3} \right]_{1}^{+\infty}$</td>
+                    <td>On sort les constantes.</td>
+                </tr>
+                <tr>
+                    <td>4. Bornes</td>
+                    <td>$= 3 (0 - (\frac{-1}{3})) = 3(\frac{1}{3}) = 1$</td>
+                    <td>$\lim_{x\to\infty} \frac{1}{x^3} = 0$.</td>
+                </tr>
+            </table>
+            <p style="color:var(--success-color); font-weight:bold;">Conclusion : C'est bien une densité de probabilité.</p>
+        </div>
+
+        <div class="box">
+            <h3>Exercice 2 : Intégration par Parties (Exponentielle)</h3>
+            <p><strong>Objectif :</strong> Calculer $F(x) = \int_{0}^{x} t e^{-t} dt$.</p>
+            <p>On utilise la formule : $\int u v' = [uv] - \int u'v$.</p>
+            
+            <div style="background:white; padding:15px; border:1px solid #ccc;">
+                <strong>Choix des variables :</strong><br>
+                $u(t) = t \quad \Rightarrow \quad u'(t) = 1$<br>
+                $v'(t) = e^{-t} \quad \Rightarrow \quad v(t) = -e^{-t}$
+            </div>
+            <br>
+            <p><strong>Résolution :</strong></p>
+            <p>
+                $$ \begin{align} 
+                F(x) &= \left[ -t e^{-t} \right]_0^x - \int_0^x 1 \cdot (-e^{-t}) dt \\
+                     &= (-x e^{-x} - 0) + \int_0^x e^{-t} dt \\
+                     &= -x e^{-x} + \left[ -e^{-t} \right]_0^x \\
+                     &= -x e^{-x} + (-e^{-x} - (-1)) \\
+                     &= 1 - e^{-x}(1+x)
+                \end{align} $$
+            </p>
+        </div>
+
+        <div class="box">
+            <h3>Exercice 3 : Trouver le paramètre $\lambda$</h3>
+            <p><strong>Énoncé :</strong> $f(t) = \lambda t^{-2}$ sur $[1, 10]$. Trouver $\lambda$.</p>
+            <p>Condition de normalisation : $\int_{1}^{10} f(t) dt = 1$.</p>
+            
+            <p>$$ \lambda \int_{1}^{10} t^{-2} dt = 1 $$</p>
+            <p>$$ \lambda \left[ \frac{-1}{t} \right]_{1}^{10} = 1 $$</p>
+            <p>$$ \lambda \left( -\frac{1}{10} - (-1) \right) = 1 $$</p>
+            <p>$$ \lambda (1 - 0.1) = 1 \implies 0.9\lambda = 1 $$</p>
+            <p class="box pro-tip" style="text-align:center; font-size:1.2em;">
+                $$ \lambda = \frac{10}{9} $$
+            </p>
+        </div>
+
+    </section>
+
+    <!-- SCRIPTS LOGIC -->
+    <script type="module">
+        // 1. Import Libraries
+        import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+
+        // 2. Initialize Mermaid
+        mermaid.initialize({ startOnLoad: true, theme: 'default' });
+
+        // 3. Render Viz.js (Dot) Graph
+        const dotCode = `digraph DiscreteTimeSpace {
+            rankdir=LR;
+            bgcolor="transparent";
+            nodesep=0.5;
+            ranksep=0.5;
+            
+            node [shape=plaintext, fontname="Arial", fontsize=12, fontcolor="#555"];
+            t0 [label="t=0"]; t1 [label="t=1"]; t2 [label="t=2"]; t3 [label="t=3"]; t4 [label="t=4"];
+            
+            edge [color="#BBB", arrowsize=0.6];
+            t0 -> t1 -> t2 -> t3 -> t4;
+
+            node [shape=circle, style=filled, fillcolor="#FFCC80", color="#E65100", fontcolor="black", fixedsize=true, width=0.6];
+            p0 [label="3"]; p1 [label="4"]; p2 [label="2"]; p3 [label="2"]; p4 [label="5"];
+
+            { rank=same; t0; p0; }
+            { rank=same; t1; p1; }
+            { rank=same; t2; p2; }
+            { rank=same; t3; p3; }
+            { rank=same; t4; p4; }
+
+            edge [style=dashed, color="#D84315", penwidth=2];
+            p0 -> p1; p1 -> p2; p2 -> p3; p3 -> p4;
+        }`;
+
+        instance().then(viz => {
+            const svg = viz.renderString(dotCode, { engine: 'dot', format: 'svg' });
+            document.getElementById('viz-discrete').innerHTML = svg;
+        }).catch(err => {
+            document.getElementById('viz-discrete').innerHTML = `<p style="color:red">Erreur Graphique: ${err}</p>`;
+        });
+
+        // 4. Global function for Toggles (attached to window for HTML access)
+        window.toggleSolution = function(id) {
+            const el = document.getElementById(id);
+            if (el.style.display === "block") {
+                el.style.display = "none";
+            } else {
+                el.style.display = "block";
+            }
+        };
+    </script>
+
+</body>
+</html>

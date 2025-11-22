@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chapitre 10 : Fiabilité & Disponibilité (Ingénierie)</title>
+    
+    <!-- MathJax Configuration for Single Dollar Signs -->
+    <script>
+        window.MathJax = {
+            tex: {
+                inlineMath: [['$', '$'], ['\\(', '\\)']],
+                displayMath: [['$$', '$$'], ['\\[', '\\]']],
+                processEscapes: true
+            },
+            svg: {
+                fontCache: 'global'
+            }
+        };
+    </script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <style>
+        :root {
+            --primary: #0056b3;
+            --secondary: #6c757d;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --info: #17a2b8;
+        }
+
+        body {
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background-color: #f4f6f9;
+            margin: 0;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+            background: white;
+            padding: 40px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1, h2, h3 {
+            color: var(--dark);
+            margin-top: 1.5em;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary);
+            border-bottom: 3px solid var(--primary);
+            padding-bottom: 10px;
+        }
+
+        h2 {
+            border-left: 5px solid var(--primary);
+            padding-left: 15px;
+            background: #e9ecef;
+            padding-top: 10px;
+            padding-bottom: 10px;
+        }
+
+        /* Pedagogical Boxes */
+        .box {
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 5px;
+            border-left: 5px solid;
+        }
+
+        .definition {
+            background-color: #e7f5ff;
+            border-color: var(--primary);
+        }
+        .definition::before { content: "📘 Définition : "; font-weight: bold; color: var(--primary); }
+
+        .pro-tip {
+            background-color: #d4edda;
+            border-color: var(--success);
+        }
+        .pro-tip::before { content: "💡 Astuce Pro : "; font-weight: bold; color: var(--success); }
+
+        .vigilance {
+            background-color: #fff3cd;
+            border-color: var(--warning);
+        }
+        .vigilance::before { content: "⚠️ Zone de Vigilance : "; font-weight: bold; color: #856404; }
+
+        /* Graph Containers */
+        .graph-container {
+            text-align: center;
+            margin: 20px 0;
+            padding: 10px;
+            border: 1px dashed #ccc;
+            background: #fff;
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* Interactive Exercises */
+        .exercise {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            padding: 20px;
+            border-radius: 8px;
+            margin-top: 30px;
+        }
+
+        .exercise-btn {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 14px;
+            margin-top: 10px;
+            transition: background 0.3s;
+        }
+
+        .exercise-btn:hover { background-color: #004494; }
+
+        .solution {
+            display: none;
+            margin-top: 15px;
+            padding: 15px;
+            background-color: white;
+            border-left: 3px solid var(--success);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        th, td {
+            padding: 12px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        th {
+            background-color: var(--primary);
+            color: white;
+        }
+        tr:nth-child(even) { background-color: #f2f2f2; }
+
+    </style>
+</head>
+<body>
+
+<div class="container">
+
+    <h1>Chapitre 10 : Fiabilité et Disponibilité</h1>
+    <p>
+        Ce module interactif explore l'application des chaînes de Markov (CTMC) pour modéliser la disponibilité de systèmes industriels. 
+        Nous nous concentrerons sur l'impact de l'architecture (Série vs Parallèle) et des ressources de maintenance (1 vs 2 réparateurs).
+    </p>
+
+    <!-- ================= SECTION 1 ================= -->
+    <h2>1. Système à 2 Composants et 2 Réparateurs</h2>
+
+    <div class="definition">
+        <p>Un système <strong>réparable</strong> oscille entre fonctionnement et panne. Ici, nous étudions deux composants identiques avec :</p>
+        <ul>
+            <li>Taux de défaillance : $\lambda$ (par composant)</li>
+            <li>Taux de réparation : $\mu$ (par réparateur)</li>
+        </ul>
+    </div>
+
+    <h3>1.1. Modélisation Graphique</h3>
+    <p>
+        L'espace d'états est défini par le nombre de composants en panne $k \in \{0, 1, 2\}$.
+        Puisqu'il y a 2 réparateurs, si 2 machines sont en panne, elles sont réparées simultanément.
+    </p>
+
+    <!-- GRAPH CONTAINER FOR 2 REPAIRMEN -->
+    <div class="graph-container" id="graph-2rep">
+        <em>Génération du diagramme en cours...</em>
+    </div>
+    <!-- Hidden code source for the graph -->
+    <script type="text/plain" id="code-2rep">
+digraph G {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [style=filled, fillcolor="#e6f3ff", fontname="Arial", shape=circle, fixedsize=true, width=1.2];
+    edge [fontname="Arial", fontsize=12];
+
+    0 [label="État 0\n(2 UP)"];
+    1 [label="État 1\n(1 UP)"];
+    2 [label="État 2\n(2 DOWN)"];
+
+    0 -> 1 [label="2λ", color="#d62728", fontcolor="#d62728"];
+    1 -> 0 [label="μ", color="#2ca02c", fontcolor="#2ca02c"];
+    1 -> 2 [label="λ", color="#d62728", fontcolor="#d62728"];
+    2 -> 1 [label="2μ", color="#2ca02c", fontcolor="#2ca02c", penwidth=2];
+}
+    </script>
+
+    <div class="vigilance">
+        <p><strong>Pourquoi le retour de 2 à 1 est-il à un taux $2\mu$ ?</strong></p>
+        <p>Deux réparateurs travaillent indépendamment. Le temps pour sortir de l'état 2 est le minimum de deux variables exponentielles $Exp(\mu)$. La loi du minimum est $Exp(\mu + \mu) = Exp(2\mu)$.</p>
+    </div>
+
+    <h3>1.2. Solution Mathématique</h3>
+    <p>En résolvant les équations d'équilibre (voir section exercices pour le détail), nous obtenons la distribution stationnaire :</p>
+    
+    $$ \pi_0 = \frac{1}{(1 + \frac{\lambda}{\mu})^2}, \quad \pi_1 = \frac{2\lambda\mu}{(\lambda+\mu)^2}, \quad \pi_2 = \frac{\lambda^2}{(\lambda+\mu)^2} $$
+
+    <!-- MINI EXERCISE 1 -->
+    <div class="exercise">
+        <h4>⚡ Mini-Exercice 1 : Compréhension des flux</h4>
+        <p>Supposons que $\lambda = 1$ panne/h et $\mu = 10$ réparations/h. Quelle est la probabilité approximative que le système soit totalement à l'arrêt (État 2) ?</p>
+        
+        <button class="exercise-btn" onclick="toggleSolution('sol-1')">Voir la réponse</button>
+        
+        <div id="sol-1" class="solution">
+            <p>Calculons le ratio $\rho = \frac{\lambda}{\mu} = \frac{1}{10} = 0.1$.</p>
+            <p>La formule pour $\pi_2$ est :
+            $$ \pi_2 = \frac{\lambda^2}{(\lambda+\mu)^2} = \left( \frac{1}{1+10} \right)^2 = \left( \frac{1}{11} \right)^2 \approx 0.0082 $$
+            </p>
+            <p><strong>Interprétation :</strong> Le système est totalement en panne moins de 1% du temps grâce à la réparation rapide et double.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ================= SECTION 2 ================= -->
+    <h2>2. Système avec 1 Seul Réparateur</h2>
+
+    <p>
+        Si nous réduisons le budget maintenance, un seul technicien doit réparer les machines. Si les deux tombent en panne, la deuxième doit <strong>attendre</strong> que la première soit réparée.
+    </p>
+
+    <!-- GRAPH CONTAINER FOR 1 REPAIRMAN -->
+    <div class="graph-container" id="graph-1rep">
+        <em>Génération du diagramme en cours...</em>
+    </div>
+    <script type="text/plain" id="code-1rep">
+digraph G {
+    rankdir=LR;
+    bgcolor="transparent";
+    node [style=filled, fillcolor="#fff2cc", fontname="Arial", shape=circle, fixedsize=true, width=1.2];
+    edge [fontname="Arial", fontsize=12];
+
+    0 [label="État 0\n(2 UP)"];
+    1 [label="État 1\n(1 UP)"];
+    2 [label="État 2\n(2 DOWN)"];
+
+    0 -> 1 [label="2λ", color="#d62728"];
+    1 -> 0 [label="μ", color="#2ca02c"];
+    1 -> 2 [label="λ", color="#d62728"];
+    2 -> 1 [label="μ", color="#2ca02c", penwidth=3, style="dashed"];
+    
+    labelloc="b";
+    label="Notez le changement : Taux = μ (File d'attente)";
+}
+    </script>
+
+    <div class="pro-tip">
+        <p>Le taux de transition $2 \to 1$ devient $\mu$ (au lieu de $2\mu$). C'est le <strong>goulot d'étranglement</strong> du système.</p>
+    </div>
+
+    <h3>2.2. Solution Mathématique</h3>
+    <p>La distribution change car l'équilibre $1 \leftrightarrow 2$ devient $\lambda \pi_1 = \mu \pi_2$.</p>
+    
+    $$ \pi_0 = \frac{1}{1 + 2(\frac{\lambda}{\mu}) + 2(\frac{\lambda}{\mu})^2} $$
+    $$ \pi_2 = 2 \left( \frac{\lambda}{\mu} \right)^2 \pi_0 $$
+
+    <!-- ================= SECTION 3 ================= -->
+    <h2>3. Calcul de la Disponibilité (Série vs Parallèle)</h2>
+
+    <p>Une fois les $\pi_k$ calculés, la disponibilité $A$ dépend de l'architecture logique.</p>
+
+    <table>
+        <thead>
+            <tr>
+                <th>Architecture</th>
+                <th>Logique de Fonctionnement</th>
+                <th>États Fonctionnels (UP)</th>
+                <th>Formule Disponibilité ($A$)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><strong>Série</strong></td>
+                <td>Tout doit marcher</td>
+                <td>État 0 uniquement</td>
+                <td>$A_{série} = \pi_0$</td>
+            </tr>
+            <tr>
+                <td><strong>Parallèle</strong> (Redondance)</td>
+                <td>Au moins 1 marche</td>
+                <td>État 0 + État 1</td>
+                <td>$A_{para} = \pi_0 + \pi_1 = 1 - \pi_2$</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <!-- MINI EXERCISE 2 -->
+    <div class="exercise">
+        <h4>⚡ Mini-Exercice 2 : Série ou Parallèle ?</h4>
+        <p>Votre système est une centrale électrique avec 2 générateurs. Il suffit d'un seul générateur pour alimenter la ville. Quel indicateur devez-vous minimiser pour éviter le black-out ?</p>
+        
+        <button class="exercise-btn" onclick="toggleSolution('sol-2')">Voir la réponse</button>
+        
+        <div id="sol-2" class="solution">
+            <p>C'est un système en <strong>Parallèle</strong>.</p>
+            <p>Le black-out correspond à l'arrêt total (État 2). Vous devez minimiser <strong>$\pi_2$</strong> (Indisponibilité).</p>
+            <p>Si c'était un système série (ex: 2 câbles bout à bout), il faudrait minimiser $\pi_1 + \pi_2$.</p>
+        </div>
+    </div>
+
+    <hr>
+
+    <!-- ================= SECTION 4: CORRIGÉS ================= -->
+    <h2>4. Corrigés des Travaux Dirigés</h2>
+    
+    <p>Voici l'étude comparative complète intégrée étape par étape.</p>
+
+    <h3>Exercice : Comparaison d'impact (1 vs 2 Réparateurs)</h3>
+    <p><strong>Énoncé :</strong> Calculez et comparez l'indisponibilité ($\pi_2$) d'un système redondant (parallèle) pour les deux cas de maintenance.</p>
+
+    <div class="box" style="border-color: #6610f2; background: #f3f0ff;">
+        <h4>📋 Solution Détaillée</h4>
+        
+        <p>Nous utilisons les équations de balance locale (Coupes) : Flux Sortant = Flux Entrant.</p>
+
+        <table>
+            <thead>
+                <tr>
+                    <th>Étape</th>
+                    <th>Cas A : 2 Réparateurs</th>
+                    <th>Cas B : 1 Réparateur</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Coupe 0-1</strong></td>
+                    <td>$2\lambda \pi_0 = \mu \pi_1 \Rightarrow \pi_1 = 2\rho \pi_0$</td>
+                    <td>$2\lambda \pi_0 = \mu \pi_1 \Rightarrow \pi_1 = 2\rho \pi_0$</td>
+                </tr>
+                <tr>
+                    <td><strong>Coupe 1-2</strong></td>
+                    <td>$\lambda \pi_1 = \mathbf{2\mu} \pi_2 \Rightarrow \pi_2 = \frac{\lambda}{2\mu}\pi_1$</td>
+                    <td>$\lambda \pi_1 = \mathbf{\mu} \pi_2 \Rightarrow \pi_2 = \frac{\lambda}{\mu}\pi_1$</td>
+                </tr>
+                <tr>
+                    <td><strong>$\pi_2$ en fct de $\pi_0$</strong></td>
+                    <td>$\pi_2 = \rho^2 \pi_0$</td>
+                    <td>$\pi_2 = 2\rho^2 \pi_0$</td>
+                </tr>
+                <tr>
+                    <td><strong>Normalisation</strong><br>($\sum \pi_i = 1$)</td>
+                    <td>$\pi_0 (1 + 2\rho + \rho^2) = 1$<br>$\pi_0 (1+\rho)^2 = 1$</td>
+                    <td>$\pi_0 (1 + 2\rho + 2\rho^2) = 1$<br>Pas de simplification quadratique</td>
+                </tr>
+                <tr>
+                    <td><strong>Indisponibilité</strong><br>($U = \pi_2$)</td>
+                    <td>$$ U_A = \frac{\rho^2}{(1+\rho)^2} $$</td>
+                    <td>$$ U_B = \frac{2\rho^2}{1 + 2\rho + 2\rho^2} $$</td>
+                </tr>
+            </tbody>
+        </table>
+
+        <p><strong>Conclusion :</strong> Pour $\rho$ petit (réparation rapide), $U_B \approx 2 U_A$. Avoir un seul réparateur <strong>double</strong> quasiment le temps d'indisponibilité du système par rapport à deux réparateurs.</p>
+    </div>
+
+</div>
+
+<!-- ================= SCRIPTS ================= -->
+
+<script type="module">
+    // Import Viz.js for DOT rendering
+    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+
+    // Function to render DOT graphs
+    async function renderAllGraphs() {
+        try {
+            const viz = await instance();
+            
+            // Render Graph 1 (2 Rep)
+            const code2 = document.getElementById('code-2rep').textContent;
+            const svg2 = viz.renderString(code2, { engine: 'dot', format: 'svg' });
+            document.getElementById('graph-2rep').innerHTML = svg2;
+
+            // Render Graph 2 (1 Rep)
+            const code1 = document.getElementById('code-1rep').textContent;
+            const svg1 = viz.renderString(code1, { engine: 'dot', format: 'svg' });
+            document.getElementById('graph-1rep').innerHTML = svg1;
+
+        } catch (err) {
+            console.error("Graph rendering error:", err);
+            document.querySelectorAll('.graph-container').forEach(el => {
+                el.innerHTML = `<p style="color:red">Erreur de rendu graphique: ${err.message}</p>`;
+            });
+        }
+    }
+
+    // Run on load
+    renderAllGraphs();
+</script>
+
+<script>
+    // Function to toggle solutions
+    function toggleSolution(id) {
+        const el = document.getElementById(id);
+        if (el.style.display === "block") {
+            el.style.display = "none";
+        } else {
+            el.style.display = "block";
+        }
+    }
+</script>
+
+</body>
+</html>
