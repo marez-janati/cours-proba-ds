@@ -3,487 +3,582 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chapitre 12 : Synthèse et Problèmes d'Examen</title>
+    <title>Guide Interactif : Processus Stochastiques & Chaînes de Markov</title>
     
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700&family=Fira+Code:wght@400&display=swap" rel="stylesheet">
-
-    <!-- MathJax Configuration -->
+    <!-- MathJax Configuration for Single Dollar Sign -->
     <script>
     window.MathJax = {
       tex: {
         inlineMath: [['$', '$'], ['\\(', '\\)']],
-        displayMath: [['$$', '$$'], ['\\[', '\\]']]
+        displayMath: [['$$', '$$'], ['\\[', '\\]']],
+        processEscapes: true
       },
       svg: {
         fontCache: 'global'
       }
     };
     </script>
-    <script type="text/javascript" id="MathJax-script" async
-      src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml.js">
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+    <!-- Mermaid JS for Graphs -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ startOnLoad: true, theme: 'neutral' });
     </script>
 
     <style>
         :root {
-            --primary: #2c3e50;
-            --accent: #3498db;
-            --success: #27ae60;
-            --warning: #f39c12;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
+            --primary-color: #2c3e50;
+            --accent-color: #3498db;
+            --success-color: #27ae60;
+            --warning-bg: #fff3cd;
+            --warning-text: #856404;
+            --tip-bg: #d1ecf1;
+            --tip-text: #0c5460;
+            --def-bg: #e2e3e5;
+            --def-text: #383d41;
         }
 
         body {
-            font-family: 'Roboto', sans-serif;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             line-height: 1.6;
-            background-color: var(--bg-color);
             color: #333;
-            margin: 0;
+            max-width: 1000px;
+            margin: 0 auto;
             padding: 20px;
+            background-color: #f8f9fa;
         }
 
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
+        h1, h2, h3 {
+            color: var(--primary-color);
         }
 
         h1 {
             text-align: center;
-            color: var(--primary);
-            margin-bottom: 40px;
-            border-bottom: 3px solid var(--accent);
-            display: inline-block;
+            border-bottom: 3px solid var(--accent-color);
             padding-bottom: 10px;
+            margin-bottom: 30px;
         }
 
-        /* --- PROBLEM CARD STYLING --- */
-        .problem-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            margin-bottom: 40px;
-            overflow: hidden;
-            border-top: 5px solid var(--primary);
-        }
-
-        .card-header {
-            padding: 25px;
-            border-bottom: 1px solid #eee;
-        }
-
-        .card-header h2 {
-            margin-top: 0;
-            color: var(--primary);
-            font-size: 1.5rem;
-        }
-
-        .problem-statement {
-            background-color: #e8f4fd;
-            padding: 15px;
+        .problem-container {
+            background: white;
             border-radius: 8px;
-            border-left: 5px solid var(--accent);
-            margin-bottom: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            padding: 25px;
+            margin-bottom: 30px;
+            border-left: 5px solid var(--accent-color);
         }
 
-        .question-list {
-            list-style: none;
-            padding: 0;
-        }
-
-        .question-list li {
-            background: #f9f9f9;
-            margin: 10px 0;
-            padding: 15px;
-            border-radius: 5px;
-            border: 1px solid #eee;
-            display: flex;
-            align-items: flex-start;
-        }
-
-        .question-badge {
-            background: var(--primary);
-            color: white;
-            padding: 2px 8px;
+        .meta-info {
+            font-size: 0.85em;
+            color: #666;
+            background: #eee;
+            padding: 5px 10px;
             border-radius: 4px;
+            display: inline-block;
+            margin-bottom: 15px;
+        }
+
+        .question-box {
             font-weight: bold;
-            margin-right: 15px;
-            font-size: 0.9em;
-            min-width: 25px;
-            text-align: center;
+            margin: 15px 0;
         }
 
-        /* --- GRAPHICS --- */
-        .graph-container {
-            text-align: center;
-            margin: 20px auto;
-            min-height: 180px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-        }
-
-        /* --- INTERACTION --- */
-        .interaction-area {
-            text-align: center;
-            padding: 20px;
-            background: #f1f1f1;
-            border-top: 1px solid #ddd;
-        }
-
-        .toggle-btn {
-            background-color: var(--accent);
+        /* Button Styles */
+        .btn-toggle {
+            background-color: var(--accent-color);
             color: white;
             border: none;
-            padding: 12px 30px;
-            font-size: 16px;
-            border-radius: 30px;
+            padding: 10px 20px;
+            border-radius: 5px;
             cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
-            box-shadow: 0 4px 6px rgba(52, 152, 219, 0.3);
+            font-size: 16px;
+            transition: background 0.3s;
+            display: block;
+            width: 100%;
+            text-align: left;
+            margin-top: 15px;
         }
 
-        .toggle-btn:hover {
+        .btn-toggle:hover {
             background-color: #2980b9;
-            transform: translateY(-2px);
         }
 
-        /* --- SOLUTION SECTION (HIDDEN INITIALLY) --- */
-        .solution-section {
-            display: none; /* Hidden by default */
-            padding: 30px;
-            background-color: #fff;
-            border-top: 2px dashed #ccc;
-            animation: fadeIn 0.5s ease-in-out;
+        .btn-toggle::after {
+            content: ' ▼';
+            float: right;
+        }
+
+        .btn-toggle.active::after {
+            content: ' ▲';
+        }
+
+        /* Solution Section (Hidden by default) */
+        .solution-content {
+            display: none;
+            padding: 20px;
+            background-color: #fdfdfd;
+            border: 1px solid #ddd;
+            border-top: none;
+            animation: fadeIn 0.5s;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-10px); }
-            to { opacity: 1; transform: translateY(0); }
+            from { opacity: 0; }
+            to { opacity: 1; }
         }
 
-        .solution-title {
-            color: var(--success);
-            font-weight: bold;
-            margin-bottom: 15px;
-            display: flex;
-            align-items: center;
-        }
-        .solution-title::before {
-            content: "✓";
-            margin-right: 10px;
-            font-size: 1.5em;
-        }
-
-        /* Educational Boxes inside solution */
+        /* Pedagogical Boxes */
         .box {
-            border-radius: 5px;
             padding: 15px;
             margin: 15px 0;
+            border-radius: 5px;
             border-left: 4px solid;
-            font-size: 0.95rem;
         }
-        .vigilance { background: #fff3cd; border-color: var(--warning); }
-        .theory { background: #d4edda; border-color: var(--success); }
-        .math-block { background: #f8f9fa; border: 1px solid #e9ecef; padding: 15px; border-radius: 5px; }
 
+        .warning {
+            background-color: var(--warning-bg);
+            color: var(--warning-text);
+            border-color: #ffeeba;
+        }
+
+        .tip {
+            background-color: var(--tip-bg);
+            color: var(--tip-text);
+            border-color: #bee5eb;
+        }
+
+        .definition {
+            background-color: var(--def-bg);
+            color: var(--def-text);
+            border-color: #d6d8db;
+        }
+
+        .mini-exercise {
+            border: 2px dashed var(--success-color);
+            padding: 15px;
+            margin-top: 20px;
+            background: #f0fff4;
+        }
+
+        .mini-ex-answer {
+            display: none;
+            margin-top: 10px;
+            font-weight: bold;
+            color: var(--success-color);
+        }
+
+        /* Tables */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 15px 0;
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center;
+        }
+        th {
+            background-color: #f2f2f2;
+        }
+
+        .center-img {
+            display: flex;
+            justify-content: center;
+            margin: 20px 0;
+        }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <div style="text-align: center;">
-        <h1>Synthèse & Problèmes d'Examen</h1>
-        <p style="max-width: 600px; margin: 0 auto 40px auto; color: #666;">
-            Essayez de résoudre chaque problème avant de révéler la correction. 
-            Ces exercices couvrent le paramétrage probabiliste, les matrices infinies et les propriétés matricielles.
-        </p>
-    </div>
+    <h1>🎓 Simulation d'Examen : Processus Stochastiques</h1>
+    <p style="text-align: center; font-size: 1.1em;">
+        <em>Ce guide interactif couvre les processus de Poisson, les DTMC (Chaînes de Markov à Temps Discret) et les CTMC. <br>
+        Pour simuler les conditions d'examen, les solutions sont masquées par défaut.</em>
+    </p>
 
-    <!-- =========================================
-         PROBLEM 1: THE ROBOT
-         ========================================= -->
-    <div class="problem-card">
-        <div class="card-header">
-            <h2>Problème 1 : La Marche Aléatoire du Robot</h2>
+    <!-- ================= PROBLEME 1 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : TD1 - Exercice 1 & Notes Séance 4</div>
+        <h2>Problème 1 : Les Urgences de l'Hôpital (Poisson)</h2>
+        
+        <div class="definition">
+            <strong>📘 Rappel :</strong> Pour un processus de Poisson de paramètre $\alpha$, la probabilité d'avoir $k$ événements est $P(X=k) = \frac{\alpha^k e^{-\alpha}}{k!}$.
+        </div>
+
+        <p><strong>Énoncé :</strong><br>
+        Dans une urgence d'un hôpital, les patients arrivent selon un processus de Poisson avec une moyenne de <strong>6 patients/h</strong>.<br>
+        Par ailleurs, des appels arrivent à un centre d'appel avec une moyenne de <strong>4 appels/minute</strong>.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Calculez la probabilité que durant une période de <strong>90 min</strong>, le nombre de patients arrivant à l'urgence est :<br>
+            &nbsp;&nbsp;&nbsp;a. Exactement 7.<br>
+            &nbsp;&nbsp;&nbsp;b. Au moins 3.<br>
+            2. Pour le centre d'appel :<br>
+            &nbsp;&nbsp;&nbsp;a. Quel est le nombre moyen d'appels arrivant pendant <strong>2 min</strong>.<br>
+            &nbsp;&nbsp;&nbsp;b. Quelle est la probabilité qu'aucun appel n'arrive pendant <strong>2 min</strong>.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol1')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol1" class="solution-content">
+            <h3>Solution Détaillée</h3>
             
-            <div class="problem-statement">
-                <strong>Énoncé :</strong> Un robot se déplace sur 3 secteurs circulaires (1, 2, 3).
-                <ul>
-                    <li>Avec probabilité $p$ : Il va dans le sens horaire ($i \to i+1$).</li>
-                    <li>Avec probabilité $1-p$ : Il va dans le sens antihoraire ($i \to i-1$).</li>
-                </ul>
+            <h4>1. Les Urgences (Période de 90 min)</h4>
+            <div class="warning">
+                <strong>⚠️ Zone de Vigilance :</strong> Attention aux unités de temps ! L'énoncé donne un taux en heures, mais la question porte sur 90 minutes. Il faut convertir 90 min en 1,5 heure.
             </div>
+            
+            <ul>
+                <li><strong>Calcul du paramètre $\lambda$ :</strong> Moyenne = 6 patients/h. Pour 1,5 h : $\lambda = 6 \times 1.5 = 9$.<br>
+                Donc $X \sim \mathcal{P}(9)$.</li>
+            </ul>
 
-            <!-- Graph is visible immediately to help visualize -->
-            <div id="graph-robot" class="graph-container">Chargement du diagramme...</div>
+            <table style="width:100%">
+                <tr>
+                    <th>Question</th>
+                    <th>Calcul</th>
+                    <th>Résultat</th>
+                </tr>
+                <tr>
+                    <td>a) Exactement 7 patients</td>
+                    <td>$P(X=7) = e^{-9} \frac{9^7}{7!}$</td>
+                    <td>$\approx 0.117$</td>
+                </tr>
+                <tr>
+                    <td>b) Au moins 3 patients ($X \ge 3$)</td>
+                    <td>$1 - P(X < 3) = 1 - [P(0) + P(1) + P(2)]$ <br> $= 1 - e^{-9}(1 + 9 + \frac{81}{2})$</td>
+                    <td>$\approx 1 - 50.5 e^{-9}$</td>
+                </tr>
+            </table>
 
-            <h3>Questions :</h3>
-            <ul class="question-list">
-                <li>
-                    <span class="question-badge">Q1</span>
-                    <div>Écrivez la matrice de transition $P$ de ce système.</div>
-                </li>
-                <li>
-                    <span class="question-badge">Q2</span>
-                    <div>
-                        Analysez la nature de la chaîne (Irréductibilité, Périodicité) selon les valeurs de $p$.
-                        <br><small><em>Indice : Que se passe-t-il si $p=1$ ?</em></small>
-                    </div>
-                </li>
-                <li>
-                    <span class="question-badge">Q3</span>
-                    <div>
-                        Si $p = 0.5$, calculez intuitivement et mathématiquement la probabilité stationnaire $\pi_2$ (probabilité d'être dans le secteur 2 à long terme).
-                    </div>
-                </li>
+            <h4>2. Le Centre d'Appel (Période de 2 min)</h4>
+            <ul>
+                <li><strong>a) Nombre moyen ($\lambda$) :</strong> Taux = 4 appels/min. Sur 2 min : $\lambda = 4 \times 2 = 8$ appels.</li>
+                <li><strong>b) Probabilité $X=0$ :</strong> $P(X=0) = e^{-8} \frac{8^0}{0!} = e^{-8}$.</li>
             </ul>
         </div>
 
-        <div class="interaction-area">
-            <button class="toggle-btn" onclick="toggleSolution('sol-1', this)">Voir la Correction</button>
+        <!-- Mini Exercise -->
+        <div class="mini-exercise">
+            <strong>🧠 Mini-Test :</strong> Si le taux était de 10 clients par heure, quel serait le paramètre $\lambda$ pour une durée de 15 minutes ?
+            <button onclick="toggleSolution('mini1')" style="margin-left:10px; padding:2px 8px; cursor:pointer;">Vérifier</button>
+            <div id="mini1" class="mini-ex-answer">
+                Réponse : 15 min = 0.25 heure. Donc $\lambda = 10 \times 0.25 = 2.5$.
+            </div>
+        </div>
+    </div>
+
+    <!-- ================= PROBLEME 2 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : TD1 - Exercice 3 & Notes Séance 4</div>
+        <h2>Problème 2 : Les Deux Urnes (Modélisation DTMC)</h2>
+
+        <p><strong>Énoncé :</strong><br>
+        Il y a deux urnes U1 et U2. Initialement, U1 contient deux boules <strong>rouges</strong>, U2 contient deux boules <strong>vertes</strong>.<br>
+        Jeu : À chaque tour, on tire une boule de U1 -> U2, puis une boule de U2 -> U1.<br>
+        Soit $X_n$ le nombre de boules rouges dans U1.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Quelles sont les valeurs possibles de $X_n$ ?<br>
+            2. Écrire la distribution initiale $\pi_0$.<br>
+            3. Dessiner la chaîne de Markov et écrire la matrice de transition $P$.<br>
+            4. Calculer la distribution stationnaire $\pi$.
         </div>
 
-        <div id="sol-1" class="solution-section">
-            <h3 class="solution-title">Correction Détaillée</h3>
+        <button class="btn-toggle" onclick="toggleSolution('sol2')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol2" class="solution-content">
+            <h3>Solution Détaillée</h3>
 
-            <h4>1. Matrice de Transition</h4>
-            <div class="math-block">
-                $$
-                P = \begin{pmatrix}
-                0 & p & 1-p \\
-                1-p & 0 & p \\
-                p & 1-p & 0
-                \end{pmatrix}
-                $$
+            <p><strong>1. Valeurs possibles :</strong> $X_n \in \{0, 1, 2\}$. (U1 peut avoir 0, 1 ou 2 Rouges).</p>
+            <p><strong>2. Distribution initiale :</strong> $\pi_0 = [0, 0, 1]$ (car on commence avec 2 Rouges).</p>
+
+            <p><strong>3. Matrice de Transition :</strong></p>
+            <div class="center-img">
+                <div class="mermaid">
+                stateDiagram-v2
+                    direction LR
+                    0 --> 0: 1/3
+                    0 --> 1: 2/3
+                    1 --> 0: 1/6
+                    1 --> 1: 2/3
+                    1 --> 2: 1/6
+                    2 --> 1: 2/3
+                    2 --> 2: 1/3
+                </div>
             </div>
 
-            <h4>2. Analyse de l'Ergodicité (Cas limites)</h4>
-            <div class="vigilance">
-                <strong>⚠️ Point de Vigilance :</strong>
-                <ul>
-                    <li>Si $p \in ]0, 1[$ : La chaîne est <strong>Ergodique</strong> (Irréductible + Apériodique). Elle converge vers une limite unique.</li>
-                    <li>Si $p = 1$ ou $p = 0$ : La chaîne devient déterministe et <strong>Périodique</strong> (période $d=3$). Elle tourne en rond indéfiniment sans converger vers une distribution stable au sens strict.</li>
-                </ul>
+            $$ P = \begin{pmatrix} 1/3 & 2/3 & 0 \\ 1/6 & 2/3 & 1/6 \\ 0 & 2/3 & 1/3 \end{pmatrix} $$
+
+            <div class="tip">
+                <strong>💡 Pro-Tip :</strong> Vérifiez toujours que la somme de chaque ligne vaut 1. Ex ligne 2 : $1/6 + 2/3 + 1/6 = 1/6 + 4/6 + 1/6 = 6/6 = 1$. ✅
             </div>
 
-            <h4>3. Résolution pour $p=0.5$</h4>
-            <p>
-                <strong>Intuition :</strong> Le système est parfaitement symétrique. Le robot n'a aucune préférence pour un secteur. Donc $\pi = (1/3, 1/3, 1/3)$.
+            <p><strong>4. Stationnarité ($\pi P = \pi$) :</strong></p>
+            En résolvant le système, on trouve par symétrie et substitution :
+            $$ \pi = [1/6, 2/3, 1/6] $$
+        </div>
+    </div>
+
+    <!-- ================= PROBLEME 3 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : DS IGL4+ICE3 - Exercice 1 & 3</div>
+        <h2>Problème 3 : Le Robot sur Trajectoire Circulaire</h2>
+
+        <p><strong>Énoncé :</strong><br>
+        Un robot se déplace sur 3 secteurs (1, 2, 3). Horaire avec proba $p$, antihoraire avec proba $1-p$.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Dessinez la chaîne et la matrice.<br>
+            2. Étudiez l'ergodicité selon $p$.<br>
+            3. Calculez la distribution stationnaire.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol3')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol3" class="solution-content">
+            <h3>Solution Détaillée</h3>
+            
+            <strong>1. Matrice $P$ :</strong>
+            $$ P = \begin{pmatrix} 0 & p & 1-p \\ 1-p & 0 & p \\ p & 1-p & 0 \end{pmatrix} $$
+
+            <strong>2. Ergodicité :</strong>
+            <ul>
+                <li>Si $p \in ]0, 1[$ : Irréductible et Apériodique (pgcd cycles = 1) $\to$ <strong>Ergodique</strong>.</li>
+                <li>Si $p=0$ ou $1$ : Déterministe et Périodique $\to$ Non ergodique.</li>
+            </ul>
+
+            <strong>3. Distribution Stationnaire :</strong>
+            <div class="definition">
+                <strong>📘 Théorème :</strong> Une matrice est <strong>doublement stochastique</strong> si la somme des lignes vaut 1 ET la somme des colonnes vaut 1. Dans ce cas, la distribution stationnaire est toujours <strong>uniforme</strong>.
+            </div>
+            Ici, la somme des colonnes vaut $(1-p)+p = 1$.
+            $$ \pi = [1/3, 1/3, 1/3] $$
+        </div>
+    </div>
+
+    <!-- ================= PROBLEME 4 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : DS IGL4+ICE3 - Exercice 2</div>
+        <h2>Problème 4 : Matrice d'États Infinis</h2>
+
+        <p><strong>Énoncé :</strong><br>
+        Matrice infinie où $P_{0j} = \frac{1}{(j+1)(j+2)}$ et $P_{i, i-1} = 1$ pour $i \ge 1$.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Écrire formellement $P_{ij}$.<br>
+            2. Relation entre $\pi_k$ et $\pi_0$.<br>
+            3. Existence de la distribution stationnaire.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol4')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol4" class="solution-content">
+            <h3>Solution Détaillée</h3>
+            
+            <p><strong>2. Relation de récurrence :</strong><br>
+            Après résolution du système $\pi P = \pi$, on trouve :
+            $$ \pi_k = \frac{1}{k+1} \pi_0 $$</p>
+
+            <p><strong>3. Existence :</strong><br>
+            Pour normaliser, il faut $\sum \pi_k = 1$.
+            $$ \pi_0 \sum_{k=0}^{\infty} \frac{1}{k+1} = 1 $$
+            Or, $\sum \frac{1}{n}$ est la <strong>série harmonique</strong> qui diverge vers $+\infty$.
+            $$ \pi_0 \times \infty = 1 \implies \pi_0 \to 0 $$
+            <span style="color:red; font-weight:bold;">Conclusion :</span> Pas de distribution stationnaire (Chaîne nulle récurrente).
             </p>
-            <p><strong>Preuve Mathématique :</strong> On résout $\pi = \pi P$.</p>
-            <div class="math-block">
-                $$ \pi_1 = (1-p)\pi_2 + p\pi_3 $$
-                Si on suppose la symétrie $\pi_1 = \pi_2 = \pi_3 = x$ :
-                $$ x = (1-p)x + px \implies x = x(1) $$
-                Cette équation est toujours vraie. Avec la condition de normalisation $\sum \pi_i = 1$, on a $3x=1 \implies x=1/3$.
+        </div>
+    </div>
+
+    <!-- ================= PROBLEME 5 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : DS - Exercice 3</div>
+        <h2>Problème 5 : Preuve Matrices Doublement Stochastiques</h2>
+
+        <p><strong>Énoncé :</strong> Montrer que toute matrice $k \times k$ doublement stochastique admet la distribution uniforme.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Exemple 4x4.<br>
+            2. Démonstration formelle.<br>
+            3. Vérification sur $P = \begin{pmatrix} 0.5 & 0.3 & 0.2 \\ 0.2 & 0.5 & 0.3 \\ 0.3 & 0.2 & 0.5 \end{pmatrix}$.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol5')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol5" class="solution-content">
+            <h3>Solution Détaillée</h3>
+            
+            <p><strong>Démonstration :</strong><br>
+            On teste $\pi(i) = 1/k$.
+            $$ (\pi P)_j = \sum_{i} \pi(i) P_{ij} = \sum_{i} \frac{1}{k} P_{ij} = \frac{1}{k} \underbrace{\sum_{i} P_{ij}}_{=1 \text{ (colonne)}} = \frac{1}{k} $$
+            On retrouve bien le vecteur $\pi$. C.Q.F.D.</p>
+            
+            <p><strong>Vérification :</strong> La matrice fournie a des sommes lignes = 1 et sommes colonnes = 1. Donc $\pi = [1/3, 1/3, 1/3]$.</p>
+        </div>
+        
+        <div class="mini-exercise">
+            <strong>🧠 Mini-Test :</strong> La matrice identité $I$ est-elle doublement stochastique ? Quelle est sa distribution stationnaire ?
+            <button onclick="toggleSolution('mini5')" style="margin-left:10px; padding:2px 8px; cursor:pointer;">Vérifier</button>
+            <div id="mini5" class="mini-ex-answer">
+                Oui, somme ligne=1 et colonne=1. La distribution stationnaire est uniforme (mais attention, elle n'est pas ergodique car non irréductible).
             </div>
         </div>
     </div>
 
-    <!-- =========================================
-         PROBLEM 2: INFINITE MATRIX
-         ========================================= -->
-    <div class="problem-card">
-        <div class="card-header">
-            <h2>Problème 2 : Matrices Infinies & Paradoxes</h2>
+    <!-- ================= PROBLEME 6 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : Séance 5 - Exercice 4</div>
+        <h2>Problème 6 : Chaîne à 10 États et Périodicité</h2>
+
+        <p><strong>Énoncé :</strong><br>
+        Graphe avec 10 états (0-9). Cycles : $2 \to 3 \to 0$, $2 \to 1 \to 0$, grande boucle $0 \to 4 \to \dots \to 9 \to 0$.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Irréductibilité ?<br>
+            2. Période de l'état 0 ?<br>
+            3. Nouvelle période si on supprime l'état 9 et ajoute $0 \to 8$.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol6')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol6" class="solution-content">
+            <h3>Solution Détaillée</h3>
             
-            <div class="problem-statement">
-                <strong>Énoncé :</strong> On considère un espace d'états infini $S = \{0, 1, 2, \dots\}$.
-                <ul>
-                    <li><strong>Depuis 0 :</strong> On saute vers $j$ avec probabilité $P_{0j} = \frac{1}{(j+1)(j+2)}$.</li>
-                    <li><strong>Depuis $j \ge 1$ :</strong> Retour déterministe vers 0 pas à pas ($j \to j-1$).</li>
-                </ul>
+            <div class="mermaid">
+            graph LR
+                2 --> 3
+                3 --> 0
+                2 --> 1
+                1 --> 0
+                0 --> 4
+                4 --> 5
+                5 --> 6
+                6 --> 7
+                7 --> 8
+                8 --> 9
+                9 --> 0
             </div>
 
-            <div id="graph-infinite" class="graph-container">Chargement...</div>
+            <p><strong>1. Irréductibilité :</strong> Oui, une seule classe, tout communique.</p>
+            
+            <p><strong>2. Période (Cas initial) :</strong><br>
+            Cycles possibles revenant à 0 (longueurs) : 4 (petit cycle implicite 2-1-0 + entrée 0?) et 7 (grande boucle).<br>
+            Note manuscrite : PGCD(4, 7) = 1.<br>
+            <strong>Chaîne Apériodique.</strong></p>
 
-            <h3>Questions :</h3>
-            <ul class="question-list">
-                <li>
-                    <span class="question-badge">Q1</span>
-                    <div>En écrivant les équations de balance, montrez que $\pi_k = \frac{\pi_0}{k+1}$.</div>
-                </li>
-                <li>
-                    <span class="question-badge">Q2</span>
-                    <div>
-                        Essayez de calculer la somme $\sum_{k=0}^{\infty} \pi_k$. Que remarquez-vous concernant la série harmonique ?
-                    </div>
-                </li>
-                <li>
-                    <span class="question-badge">Q3</span>
-                    <div>Concluez sur la nature de la chaîne (Récurrence Positive ou Nulle ?).</div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="interaction-area">
-            <button class="toggle-btn" onclick="toggleSolution('sol-2', this)">Voir la Correction</button>
-        </div>
-
-        <div id="sol-2" class="solution-section">
-            <h3 class="solution-title">Correction Détaillée</h3>
-
-            <h4>1. Calcul des sommes (Série Télescopique)</h4>
-            <p>On calcule la probabilité cumulée de quitter 0 pour aller "loin" :</p>
-            <div class="math-block">
-                On utilise la décomposition : $\frac{1}{(j+1)(j+2)} = \frac{1}{j+1} - \frac{1}{j+2}$
-                <br>
-                Cela mène à la relation : $\pi_k = \frac{\pi_0}{k+1}$.
-            </div>
-
-            <h4>2. Le Paradoxe de la Normalisation</h4>
-            <p>Pour qu'une distribution stationnaire existe, la somme des probabilités doit valoir 1.</p>
-            <div class="math-block">
-                $$ \sum_{k=0}^{\infty} \pi_k = \sum_{k=0}^{\infty} \frac{\pi_0}{k+1} = \pi_0 \underbrace{\sum_{n=1}^{\infty} \frac{1}{n}}_{\text{Série Harmonique}} $$
-            </div>
-            <div class="vigilance">
-                Or, la série harmonique <strong>diverge</strong> vers $+\infty$.
-                $$ \pi_0 \times \infty = 1 $$
-            </div>
-
-            <h4>3. Conclusion</h4>
-            <p>
-                La seule solution mathématique possible est $\pi_0 = 0$, ce qui implique $\pi_k = 0$ pour tout $k$.
-                <br><br>
-                <strong>Interprétation physique :</strong> La chaîne est <strong>Récurrente Nulle</strong>. Bien que le système revienne toujours à l'état 0 (probabilité 1), l'espérance du temps de retour est infinie. La probabilité de trouver le système dans un état précis à un instant $t$ tend vers 0 quand $t \to \infty$.
-            </p>
+            <p><strong>3. Modification (Suppression état 9) :</strong><br>
+            Nouveaux cycles identifiés : 4 et 6.<br>
+            PGCD(4, 6) = 2.<br>
+            <strong>La chaîne devient Périodique (période 2).</strong></p>
         </div>
     </div>
 
-    <!-- =========================================
-         PROBLEM 3: DOUBLY STOCHASTIC
-         ========================================= -->
-    <div class="problem-card">
-        <div class="card-header">
-            <h2>Problème 3 : Matrices Doublement Stochastiques</h2>
+    <!-- ================= PROBLEME 7 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : Séance 5 - Exercice 3</div>
+        <h2>Problème 7 : Chaîne Spécifique à 4 États</h2>
+
+        <p><strong>Transitions :</strong> $0 \to 1$ (1), $1 \to 0,1,2$, etc.</p>
+
+        <div class="question-box">
+            Questions :<br>
+            1. Matrice $P$.<br>
+            2. Calculer $\Pi$.
+        </div>
+
+        <button class="btn-toggle" onclick="toggleSolution('sol7')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol7" class="solution-content">
+            <h3>Solution Détaillée</h3>
             
-            <div class="problem-statement">
-                <strong>Définition :</strong> Une matrice est "Doublement Stochastique" si la somme de chaque ligne vaut 1 ET la somme de chaque colonne vaut 1.
-            </div>
+            $$ P = \begin{bmatrix} 0 & 1 & 0 & 0 \\ 1/4 & 1/2 & 1/4 & 0 \\ 0 & 1/2 & 0 & 1/2 \\ 0 & 0 & 1 & 0 \end{bmatrix} $$
 
-            <h3>Exercice :</h3>
-            <div style="text-align: center; margin: 20px;">
-                Soit la matrice $M$ :
-                $$
-                M = \begin{pmatrix}
-                0.1 & 0.4 & 0.5 \\
-                0.5 & 0.1 & 0.4 \\
-                0.4 & 0.5 & 0.1
-                \end{pmatrix}
-                $$
-            </div>
-            <ul class="question-list">
-                <li>
-                    <span class="question-badge">Q1</span>
-                    <div>Vérifiez si cette matrice est doublement stochastique.</div>
-                </li>
-                <li>
-                    <span class="question-badge">Q2</span>
-                    <div>
-                        Sans faire de calcul matriciel complexe ($\pi M = \pi$), donnez directement la distribution stationnaire $\pi$.
-                    </div>
-                </li>
-            </ul>
-        </div>
-
-        <div class="interaction-area">
-            <button class="toggle-btn" onclick="toggleSolution('sol-3', this)">Voir la Correction</button>
-        </div>
-
-        <div id="sol-3" class="solution-section">
-            <h3 class="solution-title">Correction Détaillée</h3>
-
-            <div class="theory">
-                <strong>💡 Théorème Fondamental :</strong>
-                Si une matrice de transition $P$ (taille $N \times N$) est doublement stochastique et irréductible, alors sa distribution stationnaire est <strong>toujours uniforme</strong> :
-                $$ \pi = \left( \frac{1}{N}, \frac{1}{N}, \dots, \frac{1}{N} \right) $$
-            </div>
-
-            <h4>Application :</h4>
+            <strong>Résolution du système :</strong>
             <ol>
-                <li><strong>Vérification colonnes :</strong>
-                    <ul>
-                        <li>Col 1 : $0.1+0.5+0.4 = 1$</li>
-                        <li>Col 2 : $0.4+0.1+0.5 = 1$</li>
-                        <li>Col 3 : $0.5+0.4+0.1 = 1$</li>
-                    </ul>
-                    Elle est bien doublement stochastique.
-                </li>
-                <li><strong>Résultat :</strong>
-                    La matrice est de taille $3 \times 3$.
-                    $$ \pi = (1/3, 1/3, 1/3) $$
-                </li>
+                <li>$\pi_1 = 4\pi_0$</li>
+                <li>$\pi_3 = 0.5\pi_2$</li>
+                <li>Après substitution : $\pi_0 = 0.5\pi_2$</li>
             </ol>
+            Normalisation : $0.5\pi_2 + 2\pi_2 + \pi_2 + 0.5\pi_2 = 1 \implies 4\pi_2 = 1$.
+            
+            <p class="box success">
+                <strong>Résultat :</strong> $\Pi = [1/8, 1/2, 1/4, 1/8]$
+            </p>
         </div>
     </div>
 
-</div>
+    <!-- ================= PROBLEME 8 ================= -->
+    <div class="problem-container">
+        <div class="meta-info">Source : Révision - Exercice 1</div>
+        <h2>Problème 8 : CTMC (Temps Continu)</h2>
 
-<!-- SCRIPTS -->
-<script type="module">
-    // Import Viz.js
-    import { instance } from "https://unpkg.com/@viz-js/viz@3.2.0/lib/viz-standalone.mjs";
+        <p><strong>Matrice de taux (Générateur Q) :</strong></p>
+        $$ Q = \begin{bmatrix} -1/3 & 1/3 & 0 \\ 0 & -1/2 & 1/2 \\ 2 & 0 & -2 \end{bmatrix} $$
 
-    const robotDotCode = `digraph RobotWalk {
-        layout=circo;
-        rankdir=LR;
-        node [shape=circle, style="filled", fillcolor="#e8f4fd", fontname="Roboto", fontsize=12, fixedsize=true, width=1.2, penwidth=2, color="#2c3e50"];
-        edge [fontname="Roboto", fontsize=10, penwidth=1.5];
-        1 [label="Secteur 1"]; 2 [label="Secteur 2"]; 3 [label="Secteur 3"];
-        1 -> 2 [label="p", color="#3498db", fontcolor="#3498db"];
-        2 -> 3 [label="p", color="#3498db", fontcolor="#3498db"];
-        3 -> 1 [label="p", color="#3498db", fontcolor="#3498db"];
-        1 -> 3 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
-        3 -> 2 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
-        2 -> 1 [label="1-p", color="#e74c3c", fontcolor="#e74c3c"];
-    }`;
+        <div class="question-box">
+            Questions :<br>
+            1. Type de chaîne ?<br>
+            2. Distribution stationnaire $\Pi$.
+        </div>
 
-    const infiniteDotCode = `digraph InfiniteChain {
-        rankdir=LR;
-        bgcolor="transparent";
-        node [shape=circle, style=filled, fillcolor="white", fontname="Roboto", color="#2c3e50"];
-        edge [fontname="Roboto", fontsize=10];
-        0 [label="0", fillcolor="#fff3cd", penwidth=2];
-        1 [label="1"]; 2 [label="2"]; 3 [label="3"];
-        inf [label="...", shape=none, style=none];
-        {rank=same; 0; 1; 2; 3; inf}
-        1 -> 0 [label="1", weight=2];
-        2 -> 1 [label="1", weight=2];
-        3 -> 2 [label="1", weight=2];
-        inf -> 3 [label="1", style=dashed, weight=2];
-        0 -> 0 [label="1/2", dir=back]; 
-        0 -> 1 [label="1/6", constraint=false, color="#3498db", fontcolor="#3498db"];
-        0 -> 2 [label="1/12", constraint=false, color="#3498db", fontcolor="#3498db"];
-        0 -> 3 [label="1/20", constraint=false, color="#3498db", fontcolor="#3498db"];
-    }`;
+        <button class="btn-toggle" onclick="toggleSolution('sol8')">👁️ Voir la Solution Détaillée</button>
+        
+        <div id="sol8" class="solution-content">
+            <h3>Solution Détaillée</h3>
+            
+            <div class="warning">
+                <strong>⚠️ Différence DTMC / CTMC :</strong>
+                <ul>
+                    <li><strong>DTMC :</strong> Matrice $P$, sommes lignes = 1. Équilibre : $\pi P = \pi$.</li>
+                    <li><strong>CTMC :</strong> Générateur $Q$, sommes lignes = 0. Équilibre : $\pi Q = 0$.</li>
+                </ul>
+            </div>
 
-    async function renderGraphs() {
-        try {
-            const viz = await instance();
-            document.getElementById('graph-robot').innerHTML = viz.renderString(robotDotCode, { engine: 'circo', format: 'svg' });
-            document.getElementById('graph-infinite').innerHTML = viz.renderString(infiniteDotCode, { engine: 'dot', format: 'svg' });
-        } catch (err) {
-            console.error(err);
+            <p><strong>Résolution ($\pi Q = 0$) :</strong><br>
+            Système :
+            $$ \begin{cases} -1/3\pi_0 + 2\pi_2 = 0 \\ 1/3\pi_0 - 1/2\pi_1 = 0 \\ \pi_0 + \pi_1 + \pi_2 = 1 \end{cases} $$
+            
+            On trouve : $\pi_2 = \frac{1}{6}\pi_0$ et $\pi_1 = \frac{2}{3}\pi_0$.<br>
+            Normalisation : $\pi_0 (1 + 2/3 + 1/6) = 1 \implies \frac{11}{6}\pi_0 = 1$.
+            </p>
+
+            $$ \Pi = [\frac{6}{11}, \frac{4}{11}, \frac{1}{11}] $$
+        </div>
+    </div>
+
+    <script>
+        // Function to toggle solutions
+        function toggleSolution(id) {
+            var x = document.getElementById(id);
+            var btn = event.currentTarget; // Get the button that was clicked
+            
+            if (x.style.display === "block") {
+                x.style.display = "none";
+                btn.classList.remove("active");
+                // Only change text for main buttons, check if it contains specific text
+                if(btn.innerHTML.includes("Voir la Solution")) {
+                    btn.innerHTML = "👁️ Voir la Solution Détaillée";
+                }
+            } else {
+                x.style.display = "block";
+                btn.classList.add("active");
+                if(btn.innerHTML.includes("Voir la Solution")) {
+                    btn.innerHTML = "❌ Masquer la Solution";
+                }
+            }
         }
-    }
-    renderGraphs();
-</script>
-
-<script>
-    function toggleSolution(id, btn) {
-        var x = document.getElementById(id);
-        if (x.style.display === "block") {
-            x.style.display = "none";
-            btn.innerText = "Voir la Correction";
-            btn.style.backgroundColor = "var(--accent)";
-        } else {
-            x.style.display = "block";
-            btn.innerText = "Masquer la Correction";
-            btn.style.backgroundColor = "#7f8c8d"; // Grey out button when open
-        }
-    }
-</script>
+    </script>
 
 </body>
 </html>
+
+
